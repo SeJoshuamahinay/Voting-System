@@ -3,81 +3,318 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Vote2Voice - Voting Page</title>
+    <title>Vote2Voice - Election Results</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .stats-card-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .stats-card-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .campaign-card {
+            transition: transform 0.2s;
+        }
+        .campaign-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body>
 
 {{-- NAVIGATION --}}
 @include('nav')
+
 <div class="container py-5">
+    <!-- Header Section -->
     <div class="row align-items-center mb-5">
-        <div class="col-md-6">
-            <h2 class="fw-bold">Hello! Welcome to the Election Results</h2>
-            <p>Your vote has been counted — view the results below.</p>
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Ongoing Elections</h5>
-                    <p class="card-text text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                    <h4 class="fw-bold mt-3">President Student Election</h4>
-                    <a href="#" class="btn btn-outline-primary mt-3">Vote now</a>
-                </div>
-            </div>
+        <div class="col-md-8">
+            <h2 class="fw-bold">Election Results Dashboard</h2>
+            <p class="text-muted">Track real-time voting results and analytics across all campaigns</p>
         </div>
-        <div class="col-md-6 text-center">
-            <img src="your-results-illustration.jpg" class="img-fluid" alt="Results illustration" />
+        <div class="col-md-4 text-end">
+            <a href="{{ route('voting.index') }}" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Cast Your Vote
+            </a>
         </div>
     </div>
 
+    <!-- Overall Statistics -->
     <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0">Real-Time Vote Tally</h5>
-                        <span class="badge bg-success">Voting in Progress</span>
-                    </div>
-                    <!-- Chart Placeholder -->
-                    <div class="my-3" style="height:250px; background:#eee; display:flex; align-items:center; justify-content:center;">
-                        <span class="text-muted">[Chart goes here]</span>
-                    </div>
-                    <!-- Legend Example -->
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-danger">Mr. Krabs</span>
-                        <span class="badge bg-warning text-dark">Spongebob</span>
-                        <span class="badge bg-primary">Plankton</span>
-                        <span class="badge bg-success">Sandy</span>
-                        <span class="badge bg-secondary">Squidward</span>
-                    </div>
-                </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h6 class="mb-2">Total Votes Cast</h6>
+                <h2 class="mb-0">{{ number_format($totalVotes) }}</h2>
+                <small><i class="bi bi-graph-up"></i> Across all campaigns</small>
             </div>
         </div>
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow-sm" style="height:250px;">
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <span class="text-muted">[Alternative content or image here, alt="Result component"]</span>
-                </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card-2">
+                <h6 class="mb-2">Active Campaigns</h6>
+                <h2 class="mb-0">{{ $activeCampaigns }}</h2>
+                <small><i class="bi bi-lightning-fill"></i> Currently in progress</small>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card-3">
+                <h6 class="mb-2">Total Campaigns</h6>
+                <h2 class="mb-0">{{ $totalCampaigns }}</h2>
+                <small><i class="bi bi-calendar-check"></i> All time</small>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm" style="height:300px;">
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <span class="text-muted">[Alternative content or image here, alt="Result component"]</span>
+    <!-- Campaigns with Charts -->
+    @forelse($campaigns as $campaign)
+        <div class="card shadow-sm mb-4 campaign-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ $campaign->title }}</h4>
+                        <p class="text-muted mb-2">{{ $campaign->description }}</p>
+                        <div>
+                            <span class="badge bg-info">{{ ucfirst($campaign->category) }}</span>
+                            @if($campaign->isActive() && !$campaign->isExpired())
+                                <span class="badge bg-success">
+                                    <i class="bi bi-circle-fill" style="font-size: 8px;"></i> Active
+                                </span>
+                            @elseif($campaign->isExpired())
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-clock-history"></i> Ended
+                                </span>
+                            @elseif($campaign->status === 'draft')
+                                <span class="badge bg-warning">
+                                    <i class="bi bi-pencil"></i> Draft
+                                </span>
+                            @else
+                                <span class="badge bg-primary">{{ ucfirst($campaign->status) }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">Ends: {{ $campaign->end_date->format('M d, Y H:i') }}</small>
+                        <small class="text-muted d-block mt-1">
+                            Total Votes: <strong>{{ $campaign->votes_count }}</strong>
+                        </small>
+                    </div>
                 </div>
+
+                @if($campaign->candidates->count() > 0 && $campaign->votes_count > 0)
+                    <div class="row">
+                        <!-- Bar Chart -->
+                        <div class="col-lg-7 mb-3">
+                            <div class="p-3 bg-light rounded" style="height: 350px;">
+                                <h6 class="fw-bold mb-3">Vote Tally - Bar Chart</h6>
+                                <div style="height: 280px;">
+                                    <canvas id="barChart{{ $campaign->id }}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart -->
+                        <div class="col-lg-5 mb-3">
+                            <div class="p-3 bg-light rounded" style="height: 350px;">
+                                <h6 class="fw-bold mb-3">Voter Turnout - Pie Chart</h6>
+                                <div style="height: 280px;">
+                                    <canvas id="pieChart{{ $campaign->id }}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Results Table -->
+                    <div class="table-responsive mt-3">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Candidate</th>
+                                    <th>Position</th>
+                                    <th>Party</th>
+                                    <th>Votes</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($campaign->candidates->sortByDesc('vote_count') as $index => $candidate)
+                                    <tr>
+                                        <td>
+                                            @if($index === 0)
+                                                <i class="bi bi-trophy-fill text-warning fs-5"></i>
+                                            @else
+                                                {{ $index + 1 }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if($candidate->photo)
+                                                    <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                        class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                                                @else
+                                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
+                                                        style="width: 35px; height: 35px;">
+                                                        <i class="bi bi-person text-white"></i>
+                                                    </div>
+                                                @endif
+                                                <strong>{{ $candidate->name }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>{{ $candidate->position }}</td>
+                                        <td>{{ $candidate->party_list ?? 'Independent' }}</td>
+                                        <td><span class="badge bg-primary">{{ $candidate->vote_count }}</span></td>
+                                        <td>
+                                            <div class="progress" style="height: 20px; width: 100px;">
+                                                <div class="progress-bar" style="width: {{ $candidate->vote_percentage }}%">
+                                                    {{ $candidate->vote_percentage }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Bar Chart
+                            const barCtx{{ $campaign->id }} = document.getElementById('barChart{{ $campaign->id }}').getContext('2d');
+                            new Chart(barCtx{{ $campaign->id }}, {
+                                type: 'bar',
+                                data: {
+                                    labels: {!! json_encode($campaign->candidates->pluck('name')->toArray()) !!},
+                                    datasets: [{
+                                        label: 'Votes',
+                                        data: {!! json_encode($campaign->candidates->pluck('vote_count')->toArray()) !!},
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.8)',
+                                            'rgba(54, 162, 235, 0.8)',
+                                            'rgba(255, 206, 86, 0.8)',
+                                            'rgba(75, 192, 192, 0.8)',
+                                            'rgba(153, 102, 255, 0.8)',
+                                            'rgba(255, 159, 64, 0.8)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(255, 99, 132, 1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 206, 86, 1)',
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(153, 102, 255, 1)',
+                                            'rgba(255, 159, 64, 1)'
+                                        ],
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        title: {
+                                            display: false
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                stepSize: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                            // Pie Chart
+                            const pieCtx{{ $campaign->id }} = document.getElementById('pieChart{{ $campaign->id }}').getContext('2d');
+                            new Chart(pieCtx{{ $campaign->id }}, {
+                                type: 'pie',
+                                data: {
+                                    labels: {!! json_encode($campaign->candidates->pluck('name')->toArray()) !!},
+                                    datasets: [{
+                                        label: 'Vote Distribution',
+                                        data: {!! json_encode($campaign->candidates->pluck('vote_count')->toArray()) !!},
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.8)',
+                                            'rgba(54, 162, 235, 0.8)',
+                                            'rgba(255, 206, 86, 0.8)',
+                                            'rgba(75, 192, 192, 0.8)',
+                                            'rgba(153, 102, 255, 0.8)',
+                                            'rgba(255, 159, 64, 0.8)'
+                                        ],
+                                        borderColor: '#fff',
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom'
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    let label = context.label || '';
+                                                    let value = context.parsed || 0;
+                                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                    let percentage = ((value / total) * 100).toFixed(1);
+                                                    return label + ': ' + value + ' votes (' + percentage + '%)';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                @else
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> 
+                        @if($campaign->candidates->count() === 0)
+                            No candidates have been added to this campaign yet.
+                        @else
+                            No votes have been cast yet.
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm" style="height:300px;">
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <span class="text-muted">[Alternative content or image here, alt="Result component"]</span>
-                </div>
+    @empty
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <h5 class="mt-3">No Campaigns Available</h5>
+                <p class="text-muted">There are no voting campaigns to display results for.</p>
             </div>
         </div>
-    </div>
+    @endforelse
 </div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 

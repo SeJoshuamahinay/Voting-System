@@ -276,9 +276,15 @@
 
             <li class="sidebar-section">Voting</li>
             <li>
-                <a href="{{ route('voting') }}" class="{{ request()->routeIs('voting') ? 'active' : '' }}">
+                <a href="{{ route('voting-campaigns.index') }}" class="{{ request()->routeIs('voting-campaigns.*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>Voting Campaigns</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('voting.index') }}" class="{{ request()->routeIs('voting.index') ? 'active' : '' }}">
                     <i class="bi bi-check2-square"></i>
-                    <span>Voting Page</span>
+                    <span>Vote Now</span>
                 </a>
             </li>
             <li>
