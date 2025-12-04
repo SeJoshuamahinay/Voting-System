@@ -9,12 +9,28 @@ use Illuminate\Support\Facades\DB;
 
 class ResultsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+
         // Get all campaigns with their candidates and votes
         $campaigns = VotingCampaign::with(['candidates', 'votes'])
             ->withCount(['candidates', 'votes'])
-            ->orderBy('created_at', 'desc')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+                });
+            })
+            ->orderByRaw("CASE 
+                WHEN status = 'active' AND start_date <= NOW() AND end_date >= NOW() THEN 1
+                WHEN status = 'active' THEN 2
+                WHEN status = 'completed' THEN 3
+                WHEN status = 'draft' THEN 4
+                ELSE 5
+            END")
+            ->orderBy('end_date', 'desc')
             ->get();
 
         // Get overall statistics
@@ -32,7 +48,7 @@ class ResultsController extends Controller
             ->get()
             ->keyBy('voting_campaign_id');
 
-        return view('results', compact('campaigns', 'totalVotes', 'totalCampaigns', 'activeCampaigns', 'voterTurnout'));
+        return view('results', compact('campaigns', 'totalVotes', 'totalCampaigns', 'activeCampaigns', 'voterTurnout', 'search'));
     }
 
     public function show($id)

@@ -17,7 +17,7 @@ class VotingCampaignSeeder extends Seeder
     {
         // School Campaign - Active
         $schoolCampaign = VotingCampaign::create([
-            'title' => 'Student Council Election 2026',
+            'title' => 'test test',
             'description' => 'Vote for your student council representatives. Your voice matters in shaping our school community!',
             'category' => 'school',
             'status' => 'active',

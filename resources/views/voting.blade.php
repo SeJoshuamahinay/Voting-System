@@ -91,10 +91,29 @@
 
 <!-- CATEGORY TOGGLE -->
 <section class="py-4" id="voting-section">
-    <div class="container text-end">
-        <button class="btn toggle-btn category-filter active" data-category="all">All</button>
-        <button class="btn toggle-btn category-filter" data-category="school">School</button>
-        <button class="btn toggle-btn category-filter" data-category="community">Community</button>
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <form action="{{ route('voting.index') }}" method="GET" class="d-flex gap-2">
+                    <input type="text" name="search" class="form-control" 
+                        placeholder="Search campaigns by title, description, or category..." 
+                        value="{{ $search ?? '' }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    @if($search ?? false)
+                        <a href="{{ route('voting.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </a>
+                    @endif
+                </form>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn toggle-btn category-filter active" data-category="all">All</button>
+                <button class="btn toggle-btn category-filter" data-category="school">School</button>
+                <button class="btn toggle-btn category-filter" data-category="community">Community</button>
+            </div>
+        </div>
     </div>
 </section>
 

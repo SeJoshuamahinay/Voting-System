@@ -48,7 +48,7 @@
 
 <div class="container py-5">
     <!-- Header Section -->
-    <div class="row align-items-center mb-5">
+    <div class="row align-items-center mb-4">
         <div class="col-md-8">
             <h2 class="fw-bold">Election Results Dashboard</h2>
             <p class="text-muted">Track real-time voting results and analytics across all campaigns</p>
@@ -57,6 +57,25 @@
             <a href="{{ route('voting.index') }}" class="btn btn-primary">
                 <i class="bi bi-box-arrow-in-right"></i> Cast Your Vote
             </a>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form action="{{ route('results') }}" method="GET" class="d-flex gap-2">
+                <input type="text" name="search" class="form-control" 
+                    placeholder="Search campaigns by title, description, or category..." 
+                    value="{{ $search ?? '' }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                @if($search)
+                    <a href="{{ route('results') }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </a>
+                @endif
+            </form>
         </div>
     </div>
 

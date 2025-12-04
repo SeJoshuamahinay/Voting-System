@@ -13,13 +13,27 @@ class VoteController extends Controller
     /**
      * Display active voting campaigns.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+
         $campaigns = VotingCampaign::active()
             ->with('candidates')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+                });
+            })
+            ->orderByRaw("CASE 
+                WHEN status = 'active' AND start_date <= NOW() AND end_date >= NOW() THEN 1
+                ELSE 2
+            END")
+            ->orderBy('end_date', 'asc')
             ->get();
 
-        return view('voting', compact('campaigns'));
+        return view('voting', compact('campaigns', 'search'));
     }
 
     /**
