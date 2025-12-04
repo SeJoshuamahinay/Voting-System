@@ -38,7 +38,7 @@
                                         @if($campaign->isExpired())
                                             <span class="badge bg-secondary ms-2">Expired</span>
                                         @elseif($campaign->isActive())
-                                            <span class="badge bg-success ms-2">Active</span>
+                                            <span class="badge bg-success ms-2">Ongoing</span>
                                         @endif
                                     </td>
                                     <td><span class="badge bg-info">{{ ucfirst($campaign->category) }}</span></td>
