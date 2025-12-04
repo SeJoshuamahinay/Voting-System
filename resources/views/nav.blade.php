@@ -15,13 +15,40 @@
                 <li class="nav-item"><a class="nav-link" href="{{ route('about') }}">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('guidelines') }}">Guidelines & FAQs</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('results') }}">Results</a></li>
-                <li class="nav-item">
-                    <a class="btn fw-bold"
-                       href="{{ route('login') }}"
-                       style="border-width:2px; border-style:solid; border-color:#007bff #ffc107 #dc3545;">
-                        Login
-                    </a>
-                </li>
+                @auth
+                    @if(auth()->user()->hasRole('administrator') || auth()->user()->hasRole('moderator'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                        </li>
+                    @endif
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ auth()->user()->name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            @if(auth()->user()->hasRole('administrator') || auth()->user()->hasRole('moderator'))
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            @endif
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="btn fw-bold"
+                           href="{{ route('login') }}"
+                           style="border-width:2px; border-style:solid; border-color:#007bff #ffc107 #dc3545;">
+                            Login
+                        </a>
+                    </li>
+                @endauth
             </ul>
         </div>
     </div>
