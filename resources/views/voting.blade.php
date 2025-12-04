@@ -152,8 +152,19 @@
                     <div class="text-end">
                         <small class="text-muted d-block">Ends: {{ $campaign->end_date->format('M d, Y H:i') }}</small>
                         @auth
-                            @if($campaign->hasUserVoted(auth()->id()))
-                                <span class="badge bg-success mt-2"><i class="bi bi-check-circle"></i> You Voted</span>
+                            @if($campaign->allow_multiple_votes)
+                                @php
+                                    $userVoteCount = $campaign->votes()->where('user_id', auth()->id())->count();
+                                @endphp
+                                @if($userVoteCount > 0)
+                                    <span class="badge bg-info mt-2">
+                                        <i class="bi bi-check-circle"></i> {{ $userVoteCount }} Vote(s) Cast
+                                    </span>
+                                @endif
+                            @else
+                                @if($campaign->hasUserVoted(auth()->id()))
+                                    <span class="badge bg-success mt-2"><i class="bi bi-check-circle"></i> You Voted</span>
+                                @endif
                             @endif
                         @endauth
                     </div>
@@ -167,20 +178,29 @@
                     <div class="alert alert-warning mb-0">
                         <i class="bi bi-info-circle"></i> Please <a href="{{ route('login') }}">login</a> to vote.
                     </div>
-                @elseif($campaign->hasUserVoted(auth()->id()))
+                @elseif(!$campaign->allow_multiple_votes && $campaign->hasUserVoted(auth()->id()))
                     <div class="alert alert-success mb-0">
                         <i class="bi bi-check-circle"></i> You have already voted in this campaign. Thank you!
                     </div>
                 @else
+                    @if($campaign->allow_multiple_votes)
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle"></i> <strong>Multiple votes allowed:</strong> You can vote for multiple candidates in this campaign.
+                        </div>
+                    @endif
                     <form action="{{ route('vote.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="voting_campaign_id" value="{{ $campaign->id }}">
 
                         <div class="row g-3">
                             @foreach($campaign->candidates as $candidate)
+                                @php
+                                    $hasVotedForCandidate = $campaign->allow_multiple_votes && 
+                                        $campaign->hasUserVoted(auth()->id(), $candidate->id);
+                                @endphp
                                 <div class="col-md-6 col-lg-4">
                                     <label class="w-100">
-                                        <div class="candidate-card d-flex gap-3 align-items-center">
+                                        <div class="candidate-card d-flex gap-3 align-items-center {{ $hasVotedForCandidate ? 'border-success' : '' }}">
                                             <div class="d-flex gap-3 align-items-center flex-grow-1">
                                                 @if($candidate->photo)
                                                     <img src="{{ asset('storage/' . $candidate->photo) }}" 
@@ -192,7 +212,12 @@
                                                 @endif
 
                                                 <div class="flex-grow-1">
-                                                    <h6 class="fw-bold m-0">{{ $candidate->name }}</h6>
+                                                    <h6 class="fw-bold m-0">
+                                                        {{ $candidate->name }}
+                                                        @if($hasVotedForCandidate)
+                                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                                        @endif
+                                                    </h6>
                                                     <small class="text-muted d-block">{{ $candidate->position }}</small>
                                                     @if($candidate->party_list)
                                                         <small class="text-muted d-block">{{ $candidate->party_list }}</small>
@@ -202,7 +227,8 @@
 
                                             <div>
                                                 <input type="radio" name="candidate_id" 
-                                                    value="{{ $candidate->id }}" required>
+                                                    value="{{ $candidate->id }}" 
+                                                    {{ $hasVotedForCandidate ? 'disabled' : 'required' }}>
                                             </div>
                                         </div>
                                     </label>

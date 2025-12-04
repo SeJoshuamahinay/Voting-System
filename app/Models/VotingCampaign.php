@@ -60,9 +60,20 @@ class VotingCampaign extends Model
 
     /**
      * Check if user has voted in this campaign.
+     * If allow_multiple_votes is true, check for specific candidate.
+     * If false, check if user has voted at all.
      */
-    public function hasUserVoted($userId)
+    public function hasUserVoted($userId, $candidateId = null)
     {
+        if ($this->allow_multiple_votes && $candidateId) {
+            // Check if user voted for this specific candidate
+            return $this->votes()
+                ->where('user_id', $userId)
+                ->where('candidate_id', $candidateId)
+                ->exists();
+        }
+        
+        // Check if user has voted at all in this campaign
         return $this->votes()->where('user_id', $userId)->exists();
     }
 

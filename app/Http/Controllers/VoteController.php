@@ -55,8 +55,16 @@ class VoteController extends Controller
         }
 
         // Check if user has already voted
-        if ($campaign->hasUserVoted(auth()->id())) {
-            return redirect()->back()->with('error', 'You have already voted in this campaign!');
+        if (!$campaign->allow_multiple_votes) {
+            // Single vote only - check if user has voted at all
+            if ($campaign->hasUserVoted(auth()->id())) {
+                return redirect()->back()->with('error', 'You have already voted in this campaign!');
+            }
+        } else {
+            // Multiple votes allowed - check if user voted for this specific candidate
+            if ($campaign->hasUserVoted(auth()->id(), $candidate->id)) {
+                return redirect()->back()->with('error', 'You have already voted for this candidate!');
+            }
         }
 
         // Check if candidate belongs to this campaign
