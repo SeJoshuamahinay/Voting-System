@@ -252,7 +252,7 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-
+            @if (auth()->user()->hasPermission('manage-users'))
             <li class="sidebar-section">User Management</li>
             <li>
                 <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
@@ -260,23 +260,29 @@
                     <span>Users</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('roles.index') }}" class="{{ request()->routeIs('roles.*') ? 'active' : '' }}">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Roles</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('permissions.index') }}"
-                    class="{{ request()->routeIs('permissions.*') ? 'active' : '' }}">
-                    <i class="bi bi-key"></i>
-                    <span>Permissions</span>
-                </a>
-            </li>
+            @endif
+            @if (auth()->user()->hasPermission('manage-roles'))
+                <li>
+                    <a href="{{ route('roles.index') }}" class="{{ request()->routeIs('roles.*') ? 'active' : '' }}">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Roles</span>
+                    </a>
+                </li>
+            @endif
+            @if (auth()->user()->hasPermission('manage-permissions'))
+                <li>
+                    <a href="{{ route('permissions.index') }}"
+                        class="{{ request()->routeIs('permissions.*') ? 'active' : '' }}">
+                        <i class="bi bi-key"></i>
+                        <span>Permissions</span>
+                    </a>
+                </li>
+            @endif
 
             <li class="sidebar-section">Voting</li>
             <li>
-                <a href="{{ route('voting-campaigns.index') }}" class="{{ request()->routeIs('voting-campaigns.*') ? 'active' : '' }}">
+                <a href="{{ route('voting-campaigns.index') }}"
+                    class="{{ request()->routeIs('voting-campaigns.*') ? 'active' : '' }}">
                     <i class="bi bi-calendar-check"></i>
                     <span>Voting Campaigns</span>
                 </a>

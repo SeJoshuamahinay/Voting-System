@@ -61,12 +61,16 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
+                        @if (auth()->user()->hasPermission('manage-roles'))
                         <a href="{{ route('roles.create') }}" class="btn btn-outline-primary">
                             <i class="bi bi-plus-circle me-2"></i>Create New Role
                         </a>
+                        @endif
+                        @if (auth()->user()->hasPermission('manage-permissions'))
                         <a href="{{ route('permissions.create') }}" class="btn btn-outline-success">
                             <i class="bi bi-plus-circle me-2"></i>Create New Permission
                         </a>
+                        @endif
                         <a href="{{route('voting.index')  }}" class="btn btn-outline-info">
                             <i class="bi bi-check2-square me-2"></i>Go to Voting
                         </a>
