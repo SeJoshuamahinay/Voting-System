@@ -74,8 +74,7 @@
                         <span class="mx-2 text-muted small">Or</span>
                         <hr class="flex-grow-1">
                     </div>
-                    <a href="{{ route('login') }}" class="btn w-100"
-                        style="background:#ccc; color:#222; border-radius:2rem; font-weight:bold;">Log In</a>
+                    <a href="{{ route('login') }}" class="text-decoration-underline justify-content-center d-flex">Already have an account?</a>
                 </form>
             </div>
         </div>

@@ -50,7 +50,7 @@
                         <div class="input-group">
                             <input type="password" class="form-control border-0 border-bottom" id="password" name="password"
                                 placeholder="Enter your password" required>
-                            <span class="input-group-text bg-white border-0" style="cursor:pointer;"
+                            <span class="input-group-text border-0" style="cursor:pointer;"
                                 id="togglePassword">
                                 <i class="bi bi-eye" style="font-size:1.5rem; color:black;"></i>
                             </span>
@@ -73,7 +73,7 @@
                         <hr class="flex-grow-1">
                     </div>
                     <a href="{{ route('register') }}" class="btn w-100"
-                        style="background:#ccc; color:#222; border-radius:2rem; font-weight:bold;">Sign Up</a>
+                        style="background:#ccc; color:#222; border-radius:2rem; font-weight:bold;">Create New Account</a>
                 </form>
             </div>
         </div>
