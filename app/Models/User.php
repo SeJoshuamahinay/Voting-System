@@ -21,7 +21,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'group_id',
     ];
+    /**
+     * Get the group for the user.
+     */
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

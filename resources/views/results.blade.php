@@ -81,22 +81,15 @@
 
     <!-- Overall Statistics -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="stats-card">
-                <h6 class="mb-2">Total Votes Cast</h6>
-                <h2 class="mb-0">{{ number_format($totalVotes) }}</h2>
-                <small><i class="bi bi-graph-up"></i> Across all campaigns</small>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="stats-card-2">
+        <div class="col-12 col-md-6 mb-3">
+            <div class="stats-card-2 w-100">
                 <h6 class="mb-2">Active Campaigns</h6>
                 <h2 class="mb-0">{{ $activeCampaigns }}</h2>
                 <small><i class="bi bi-lightning-fill"></i> Currently in progress</small>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="stats-card-3">
+        <div class="col-12 col-md-6 mb-3">
+            <div class="stats-card-3 w-100">
                 <h6 class="mb-2">Total Campaigns</h6>
                 <h2 class="mb-0">{{ $totalCampaigns }}</h2>
                 <small><i class="bi bi-calendar-check"></i> All time</small>
@@ -140,177 +133,371 @@
                 </div>
 
                 @if($campaign->candidates->count() > 0 && $campaign->votes_count > 0)
-                    <div class="row">
-                        <!-- Bar Chart -->
-                        <div class="col-lg-7 mb-3">
-                            <div class="p-3 bg-light rounded" style="height: 350px;">
-                                <h6 class="fw-bold mb-3">Vote Tally - Bar Chart</h6>
-                                <div style="height: 280px;">
-                                    <canvas id="barChart{{ $campaign->id }}"></canvas>
-                                </div>
-                            </div>
-                        </div>
+                    @if($campaign->positions->count() > 0)
+                        {{-- Display results grouped by positions --}}
+                        @foreach($campaign->positions as $position)
+                            @php
+                                $positionCandidates = $position->candidates;
+                            @endphp
+                            @if($positionCandidates->count() > 0)
+                                <div class="mb-4">
+                                    <h5 class="fw-bold border-bottom pb-2 mb-3">
+                                        <i class="bi bi-award"></i> {{ $position->title }}
+                                    </h5>
+                                    @if($position->description)
+                                        <p class="text-muted small mb-3">{{ $position->description }}</p>
+                                    @endif
 
-                        <!-- Pie Chart -->
-                        <div class="col-lg-5 mb-3">
-                            <div class="p-3 bg-light rounded" style="height: 350px;">
-                                <h6 class="fw-bold mb-3">Voter Turnout - Pie Chart</h6>
-                                <div style="height: 280px;">
-                                    <canvas id="pieChart{{ $campaign->id }}"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Detailed Results Table -->
-                    <div class="table-responsive mt-3">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Candidate</th>
-                                    <th>Position</th>
-                                    <th>Party</th>
-                                    <th>Votes</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($campaign->candidates->sortByDesc('vote_count') as $index => $candidate)
-                                    <tr>
-                                        <td>
-                                            @if($index === 0)
-                                                <i class="bi bi-trophy-fill text-warning fs-5"></i>
-                                            @else
-                                                {{ $index + 1 }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                @if($candidate->photo)
-                                                    <img src="{{ asset('storage/' . $candidate->photo) }}" 
-                                                        class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
-                                                @else
-                                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
-                                                        style="width: 35px; height: 35px;">
-                                                        <i class="bi bi-person text-white"></i>
-                                                    </div>
-                                                @endif
-                                                <strong>{{ $candidate->name }}</strong>
-                                            </div>
-                                        </td>
-                                        <td>{{ $candidate->position }}</td>
-                                        <td>{{ $candidate->party_list ?? 'Independent' }}</td>
-                                        <td><span class="badge bg-primary">{{ $candidate->vote_count }}</span></td>
-                                        <td>
-                                            <div class="progress" style="height: 20px; width: 100px;">
-                                                <div class="progress-bar" style="width: {{ $candidate->vote_percentage }}%">
-                                                    {{ $candidate->vote_percentage }}%
+                                    <div class="row">
+                                        <!-- Bar Chart -->
+                                        <div class="col-lg-7 mb-3">
+                                            <div class="p-3 bg-light rounded" style="height: 350px;">
+                                                <h6 class="fw-bold mb-3">Vote Tally - Bar Chart</h6>
+                                                <div style="height: 280px;">
+                                                    <canvas id="barChart{{ $campaign->id }}_{{ $position->id }}"></canvas>
                                                 </div>
                                             </div>
-                                        </td>
+                                        </div>
+
+                                        <!-- Pie Chart -->
+                                        <div class="col-lg-5 mb-3">
+                                            <div class="p-3 bg-light rounded" style="height: 350px;">
+                                                <h6 class="fw-bold mb-3">Vote Distribution - Pie Chart</h6>
+                                                <div style="height: 280px;">
+                                                    <canvas id="pieChart{{ $campaign->id }}_{{ $position->id }}"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Detailed Results Table -->
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Rank</th>
+                                                    <th>Candidate</th>
+                                                    <th>Party</th>
+                                                    <th>Votes</th>
+                                                    <th>Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($positionCandidates->sortByDesc('vote_count') as $index => $candidate)
+                                                    <tr>
+                                                        <td>
+                                                            @if($index === 0)
+                                                                <i class="bi bi-trophy-fill text-warning fs-5"></i>
+                                                            @else
+                                                                {{ $index + 1 }}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                @if($candidate->photo)
+                                                                    <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                                        class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                                                                @else
+                                                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
+                                                                        style="width: 35px; height: 35px;">
+                                                                        <i class="bi bi-person text-white"></i>
+                                                                    </div>
+                                                                @endif
+                                                                <strong>{{ $candidate->name }}</strong>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{ $candidate->party_list ?? 'Independent' }}</td>
+                                                        <td><span class="badge bg-primary">{{ $candidate->vote_count }}</span></td>
+                                                        <td>
+                                                            @php
+                                                                $totalPositionVotes = $positionCandidates->sum('vote_count');
+                                                                $percentage = $totalPositionVotes > 0 ? round(($candidate->vote_count / $totalPositionVotes) * 100, 1) : 0;
+                                                            @endphp
+                                                            <div class="progress" style="height: 20px; width: 100px;">
+                                                                <div class="progress-bar" style="width: {{ $percentage }}%">
+                                                                    {{ $percentage }}%
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            // Bar Chart
+                                            const barCtx{{ $campaign->id }}_{{ $position->id }} = document.getElementById('barChart{{ $campaign->id }}_{{ $position->id }}').getContext('2d');
+                                            new Chart(barCtx{{ $campaign->id }}_{{ $position->id }}, {
+                                                type: 'bar',
+                                                data: {
+                                                    labels: {!! json_encode($positionCandidates->pluck('name')->toArray()) !!},
+                                                    datasets: [{
+                                                        label: 'Votes',
+                                                        data: {!! json_encode($positionCandidates->pluck('vote_count')->toArray()) !!},
+                                                        backgroundColor: [
+                                                            'rgba(255, 99, 132, 0.8)',
+                                                            'rgba(54, 162, 235, 0.8)',
+                                                            'rgba(255, 206, 86, 0.8)',
+                                                            'rgba(75, 192, 192, 0.8)',
+                                                            'rgba(153, 102, 255, 0.8)',
+                                                            'rgba(255, 159, 64, 0.8)'
+                                                        ],
+                                                        borderColor: [
+                                                            'rgba(255, 99, 132, 1)',
+                                                            'rgba(54, 162, 235, 1)',
+                                                            'rgba(255, 206, 86, 1)',
+                                                            'rgba(75, 192, 192, 1)',
+                                                            'rgba(153, 102, 255, 1)',
+                                                            'rgba(255, 159, 64, 1)'
+                                                        ],
+                                                        borderWidth: 2
+                                                    }]
+                                                },
+                                                options: {
+                                                    responsive: true,
+                                                    maintainAspectRatio: false,
+                                                    plugins: {
+                                                        legend: {
+                                                            display: false
+                                                        },
+                                                        title: {
+                                                            display: false
+                                                        }
+                                                    },
+                                                    scales: {
+                                                        y: {
+                                                            beginAtZero: true,
+                                                            ticks: {
+                                                                stepSize: 1
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+
+                                            // Pie Chart
+                                            const pieCtx{{ $campaign->id }}_{{ $position->id }} = document.getElementById('pieChart{{ $campaign->id }}_{{ $position->id }}').getContext('2d');
+                                            new Chart(pieCtx{{ $campaign->id }}_{{ $position->id }}, {
+                                                type: 'pie',
+                                                data: {
+                                                    labels: {!! json_encode($positionCandidates->pluck('name')->toArray()) !!},
+                                                    datasets: [{
+                                                        label: 'Vote Distribution',
+                                                        data: {!! json_encode($positionCandidates->pluck('vote_count')->toArray()) !!},
+                                                        backgroundColor: [
+                                                            'rgba(255, 99, 132, 0.8)',
+                                                            'rgba(54, 162, 235, 0.8)',
+                                                            'rgba(255, 206, 86, 0.8)',
+                                                            'rgba(75, 192, 192, 0.8)',
+                                                            'rgba(153, 102, 255, 0.8)',
+                                                            'rgba(255, 159, 64, 0.8)'
+                                                        ],
+                                                        borderColor: '#fff',
+                                                        borderWidth: 2
+                                                    }]
+                                                },
+                                                options: {
+                                                    responsive: true,
+                                                    maintainAspectRatio: false,
+                                                    plugins: {
+                                                        legend: {
+                                                            position: 'bottom'
+                                                        },
+                                                        tooltip: {
+                                                            callbacks: {
+                                                                label: function(context) {
+                                                                    let label = context.label || '';
+                                                                    let value = context.parsed || 0;
+                                                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                                    let percentage = ((value / total) * 100).toFixed(1);
+                                                                    return label + ': ' + value + ' votes (' + percentage + '%)';
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    </script>
+                                </div>
+                            @endif
+                        @endforeach
+                    @else
+                        {{-- Fallback for campaigns without positions --}}
+                        <div class="row">
+                            <!-- Bar Chart -->
+                            <div class="col-lg-7 mb-3">
+                                <div class="p-3 bg-light rounded" style="height: 350px;">
+                                    <h6 class="fw-bold mb-3">Vote Tally - Bar Chart</h6>
+                                    <div style="height: 280px;">
+                                        <canvas id="barChart{{ $campaign->id }}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pie Chart -->
+                            <div class="col-lg-5 mb-3">
+                                <div class="p-3 bg-light rounded" style="height: 350px;">
+                                    <h6 class="fw-bold mb-3">Voter Turnout - Pie Chart</h6>
+                                    <div style="height: 280px;">
+                                        <canvas id="pieChart{{ $campaign->id }}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Results Table -->
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Candidate</th>
+                                        <th>Position</th>
+                                        <th>Party</th>
+                                        <th>Votes</th>
+                                        <th>Percentage</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach($campaign->candidates->sortByDesc('vote_count') as $index => $candidate)
+                                        <tr>
+                                            <td>
+                                                @if($index === 0)
+                                                    <i class="bi bi-trophy-fill text-warning fs-5"></i>
+                                                @else
+                                                    {{ $index + 1 }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    @if($candidate->photo)
+                                                        <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                            class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                                                    @else
+                                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
+                                                            style="width: 35px; height: 35px;">
+                                                            <i class="bi bi-person text-white"></i>
+                                                        </div>
+                                                    @endif
+                                                    <strong>{{ $candidate->name }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>{{ $candidate->position }}</td>
+                                            <td>{{ $candidate->party_list ?? 'Independent' }}</td>
+                                            <td><span class="badge bg-primary">{{ $candidate->vote_count }}</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px; width: 100px;">
+                                                    <div class="progress-bar" style="width: {{ $candidate->vote_percentage }}%">
+                                                        {{ $candidate->vote_percentage }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
 
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            // Bar Chart
-                            const barCtx{{ $campaign->id }} = document.getElementById('barChart{{ $campaign->id }}').getContext('2d');
-                            new Chart(barCtx{{ $campaign->id }}, {
-                                type: 'bar',
-                                data: {
-                                    labels: {!! json_encode($campaign->candidates->pluck('name')->toArray()) !!},
-                                    datasets: [{
-                                        label: 'Votes',
-                                        data: {!! json_encode($campaign->candidates->pluck('vote_count')->toArray()) !!},
-                                        backgroundColor: [
-                                            'rgba(255, 99, 132, 0.8)',
-                                            'rgba(54, 162, 235, 0.8)',
-                                            'rgba(255, 206, 86, 0.8)',
-                                            'rgba(75, 192, 192, 0.8)',
-                                            'rgba(153, 102, 255, 0.8)',
-                                            'rgba(255, 159, 64, 0.8)'
-                                        ],
-                                        borderColor: [
-                                            'rgba(255, 99, 132, 1)',
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(255, 206, 86, 1)',
-                                            'rgba(75, 192, 192, 1)',
-                                            'rgba(153, 102, 255, 1)',
-                                            'rgba(255, 159, 64, 1)'
-                                        ],
-                                        borderWidth: 2
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        },
-                                        title: {
-                                            display: false
-                                        }
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Bar Chart
+                                const barCtx{{ $campaign->id }} = document.getElementById('barChart{{ $campaign->id }}').getContext('2d');
+                                new Chart(barCtx{{ $campaign->id }}, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: {!! json_encode($campaign->candidates->pluck('name')->toArray()) !!},
+                                        datasets: [{
+                                            label: 'Votes',
+                                            data: {!! json_encode($campaign->candidates->pluck('vote_count')->toArray()) !!},
+                                            backgroundColor: [
+                                                'rgba(255, 99, 132, 0.8)',
+                                                'rgba(54, 162, 235, 0.8)',
+                                                'rgba(255, 206, 86, 0.8)',
+                                                'rgba(75, 192, 192, 0.8)',
+                                                'rgba(153, 102, 255, 0.8)',
+                                                'rgba(255, 159, 64, 0.8)'
+                                            ],
+                                            borderColor: [
+                                                'rgba(255, 99, 132, 1)',
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(255, 206, 86, 1)',
+                                                'rgba(75, 192, 192, 1)',
+                                                'rgba(153, 102, 255, 1)',
+                                                'rgba(255, 159, 64, 1)'
+                                            ],
+                                            borderWidth: 2
+                                        }]
                                     },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            ticks: {
-                                                stepSize: 1
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                display: false
+                                            },
+                                            title: {
+                                                display: false
                                             }
-                                        }
-                                    }
-                                }
-                            });
-
-                            // Pie Chart
-                            const pieCtx{{ $campaign->id }} = document.getElementById('pieChart{{ $campaign->id }}').getContext('2d');
-                            new Chart(pieCtx{{ $campaign->id }}, {
-                                type: 'pie',
-                                data: {
-                                    labels: {!! json_encode($campaign->candidates->pluck('name')->toArray()) !!},
-                                    datasets: [{
-                                        label: 'Vote Distribution',
-                                        data: {!! json_encode($campaign->candidates->pluck('vote_count')->toArray()) !!},
-                                        backgroundColor: [
-                                            'rgba(255, 99, 132, 0.8)',
-                                            'rgba(54, 162, 235, 0.8)',
-                                            'rgba(255, 206, 86, 0.8)',
-                                            'rgba(75, 192, 192, 0.8)',
-                                            'rgba(153, 102, 255, 0.8)',
-                                            'rgba(255, 159, 64, 0.8)'
-                                        ],
-                                        borderColor: '#fff',
-                                        borderWidth: 2
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom'
                                         },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function(context) {
-                                                    let label = context.label || '';
-                                                    let value = context.parsed || 0;
-                                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                                    let percentage = ((value / total) * 100).toFixed(1);
-                                                    return label + ': ' + value + ' votes (' + percentage + '%)';
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                ticks: {
+                                                    stepSize: 1
                                                 }
                                             }
                                         }
                                     }
-                                }
+                                });
+
+                                // Pie Chart
+                                const pieCtx{{ $campaign->id }} = document.getElementById('pieChart{{ $campaign->id }}').getContext('2d');
+                                new Chart(pieCtx{{ $campaign->id }}, {
+                                    type: 'pie',
+                                    data: {
+                                        labels: {!! json_encode($campaign->candidates->pluck('name')->toArray()) !!},
+                                        datasets: [{
+                                            label: 'Vote Distribution',
+                                            data: {!! json_encode($campaign->candidates->pluck('vote_count')->toArray()) !!},
+                                            backgroundColor: [
+                                                'rgba(255, 99, 132, 0.8)',
+                                                'rgba(54, 162, 235, 0.8)',
+                                                'rgba(255, 206, 86, 0.8)',
+                                                'rgba(75, 192, 192, 0.8)',
+                                                'rgba(153, 102, 255, 0.8)',
+                                                'rgba(255, 159, 64, 0.8)'
+                                            ],
+                                            borderColor: '#fff',
+                                            borderWidth: 2
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                position: 'bottom'
+                                            },
+                                            tooltip: {
+                                                callbacks: {
+                                                    label: function(context) {
+                                                        let label = context.label || '';
+                                                        let value = context.parsed || 0;
+                                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                        let percentage = ((value / total) * 100).toFixed(1);
+                                                        return label + ': ' + value + ' votes (' + percentage + '%)';
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
                             });
-                        });
-                    </script>
+                        </script>
+                    @endif
                 @else
                     <div class="alert alert-info mb-0">
                         <i class="bi bi-info-circle"></i> 

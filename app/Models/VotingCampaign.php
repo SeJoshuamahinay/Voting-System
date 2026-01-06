@@ -15,6 +15,7 @@ class VotingCampaign extends Model
         'start_date',
         'end_date',
         'allow_multiple_votes',
+        'group_id',
     ];
 
     protected $casts = [
@@ -37,6 +38,22 @@ class VotingCampaign extends Model
     public function votes()
     {
         return $this->hasMany(Vote::class);
+    }
+
+    /**
+     * Get the group for this campaign.
+     */
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    /**
+     * Get the positions for this campaign.
+     */
+    public function positions()
+    {
+        return $this->hasMany(Position::class)->orderBy('order');
     }
 
     /**

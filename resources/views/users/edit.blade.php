@@ -50,6 +50,19 @@
                             id="password_confirmation" name="password_confirmation">
                     </div>
 
+
+                    <div class="mb-3">
+                        <label for="group_id" class="form-label">Group</label>
+                        <select name="group_id" id="group_id" class="form-select">
+                            <option value="">-- No Group --</option>
+                            @foreach ($groups as $group)
+                                <option value="{{ $group->id }}" {{ old('group_id', $user->group_id) == $group->id ? 'selected' : '' }}>
+                                    {{ $group->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Assign Roles</label>
                         <div class="row">

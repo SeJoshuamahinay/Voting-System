@@ -45,6 +45,17 @@
                     </div>
                 </div>
             </div>
+            <div class="card-footer">
+                <a href="{{ route('voting-campaigns.positions', $votingCampaign) }}" class="btn btn-primary">
+                    <i class="bi bi-list-task"></i> Manage Positions
+                </a>
+                <a href="{{ route('voting-campaigns.candidates', $votingCampaign) }}" class="btn btn-success">
+                    <i class="bi bi-people"></i> Manage Candidates
+                </a>
+                <a href="{{ route('voting-campaigns.edit', $votingCampaign) }}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit Campaign
+                </a>
+            </div>
         </div>
 
         <div class="row mb-4">

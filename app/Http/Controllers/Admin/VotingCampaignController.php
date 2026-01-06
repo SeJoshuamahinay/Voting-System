@@ -25,7 +25,8 @@ class VotingCampaignController extends Controller
      */
     public function create()
     {
-        return view('admin.voting.create');
+        $groups = \App\Models\Group::orderBy('name')->get();
+        return view('admin.voting.create', compact('groups'));
     }
 
     /**
@@ -40,10 +41,13 @@ class VotingCampaignController extends Controller
             'status' => 'required|in:draft,active,completed,cancelled',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'allow_multiple_votes' => 'boolean',
         ]);
 
-        VotingCampaign::create($request->all());
+        $data = $request->all();
+        // Handle checkbox: if not present in request, set to false
+        $data['allow_multiple_votes'] = $request->has('allow_multiple_votes') ? 1 : 0;
+
+        VotingCampaign::create($data);
 
         return redirect()->route('voting-campaigns.index')
             ->with('success', 'Voting campaign created successfully!');
@@ -71,7 +75,8 @@ class VotingCampaignController extends Controller
      */
     public function edit(VotingCampaign $votingCampaign)
     {
-        return view('admin.voting.edit', compact('votingCampaign'));
+        $groups = \App\Models\Group::orderBy('name')->get();
+        return view('admin.voting.edit', compact('votingCampaign', 'groups'));
     }
 
     /**
@@ -86,10 +91,14 @@ class VotingCampaignController extends Controller
             'status' => 'required|in:draft,active,completed,cancelled',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'allow_multiple_votes' => 'boolean',
+            'group_id' => 'nullable|exists:groups,id',
         ]);
 
-        $votingCampaign->update($request->all());
+        $data = $request->all();
+        // Handle checkbox: if not present in request, set to false
+        $data['allow_multiple_votes'] = $request->has('allow_multiple_votes') ? 1 : 0;
+
+        $votingCampaign->update($data);
 
         return redirect()->route('voting-campaigns.index')
             ->with('success', 'Voting campaign updated successfully!');
@@ -106,11 +115,56 @@ class VotingCampaignController extends Controller
     }
 
     /**
+     * Manage positions for a campaign.
+     */
+    public function positions(VotingCampaign $votingCampaign)
+    {
+        $votingCampaign->load('positions.candidates');
+        return view('admin.voting.positions', compact('votingCampaign'));
+    }
+
+    /**
+     * Store a new position.
+     */
+    public function storePosition(Request $request, VotingCampaign $votingCampaign)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'order' => 'nullable|integer',
+        ]);
+
+        \App\Models\Position::create([
+            'voting_campaign_id' => $votingCampaign->id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'order' => $request->order ?? 0,
+        ]);
+
+        return redirect()->route('voting-campaigns.positions', $votingCampaign)
+            ->with('success', 'Position added successfully!');
+    }
+
+    /**
+     * Delete a position.
+     */
+    public function deletePosition(VotingCampaign $votingCampaign, \App\Models\Position $position)
+    {
+        if ($position->voting_campaign_id !== $votingCampaign->id) {
+            return redirect()->back()->with('error', 'Position does not belong to this campaign!');
+        }
+
+        $position->delete();
+        return redirect()->route('voting-campaigns.positions', $votingCampaign)
+            ->with('success', 'Position deleted successfully!');
+    }
+
+    /**
      * Manage candidates for a campaign.
      */
     public function candidates(VotingCampaign $votingCampaign)
     {
-        $votingCampaign->load('candidates');
+        $votingCampaign->load(['candidates.positionRelation', 'positions']);
         return view('admin.voting.candidates', compact('votingCampaign'));
     }
 
@@ -121,7 +175,7 @@ class VotingCampaignController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
+            'position_id' => 'required|exists:positions,id',
             'party_list' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',

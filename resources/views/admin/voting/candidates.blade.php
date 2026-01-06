@@ -25,7 +25,7 @@
                             @csrf
                             
                             <div class="mb-3">
-                                <label for="name" class="form-label">Candidate Name</label>
+                                <label for="name" class="form-label">Candidate Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                     id="name" name="name" required>
                                 @error('name')
@@ -34,27 +34,37 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="position" class="form-label">Position</label>
-                                <input type="text" class="form-control @error('position') is-invalid @enderror" 
-                                    id="position" name="position" placeholder="e.g., President" required>
-                                @error('position')
+                                <label for="position_id" class="form-label">Position <span class="text-danger">*</span></label>
+                                <select class="form-select @error('position_id') is-invalid @enderror" 
+                                    id="position_id" name="position_id" required>
+                                    <option value="">-- Select Position --</option>
+                                    @foreach($votingCampaign->positions as $position)
+                                        <option value="{{ $position->id }}">{{ $position->title }}</option>
+                                    @endforeach
+                                </select>
+                                @error('position_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                @if($votingCampaign->positions->count() === 0)
+                                    <small class="text-danger">
+                                        <a href="{{ route('voting-campaigns.positions', $votingCampaign) }}">Add positions first</a>
+                                    </small>
+                                @endif
                             </div>
 
                             <div class="mb-3">
-                                <label for="party_list" class="form-label">Party List</label>
+                                <label for="party_list" class="form-label">Party List <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('party_list') is-invalid @enderror" 
-                                    id="party_list" name="party_list" placeholder="e.g., Costa Party">
+                                    id="party_list" name="party_list" placeholder="e.g., Costa Party" required>
                                 @error('party_list')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
+                                <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control @error('description') is-invalid @enderror" 
-                                    id="description" name="description" rows="3"></textarea>
+                                    id="description" name="description" rows="3" required></textarea>
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -101,9 +111,15 @@
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-1">{{ $candidate->name }}</h6>
-                                                    <small class="text-muted d-block">{{ $candidate->position }}</small>
+                                                    @if($candidate->positionRelation)
+                                                        <small class="text-muted d-block">
+                                                            <i class="bi bi-award"></i> {{ $candidate->positionRelation->title }}
+                                                        </small>
+                                                    @endif
                                                     @if($candidate->party_list)
-                                                        <small class="text-muted d-block">{{ $candidate->party_list }}</small>
+                                                        <small class="text-muted d-block">
+                                                            <i class="bi bi-flag"></i> {{ $candidate->party_list }}
+                                                        </small>
                                                     @endif
                                                     <span class="badge bg-success mt-1">{{ $candidate->vote_count }} votes</span>
                                                 </div>

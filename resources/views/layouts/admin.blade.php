@@ -269,6 +269,14 @@
                     </a>
                 </li>
             @endif
+             @if (!auth()->user()->hasPermission('manage-groups'))
+                <li>
+                    <a href="{{ route('groups.index') }}" class="{{ request()->routeIs('groups.*') ? 'active' : '' }}">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Groups</span>
+                    </a>
+                </li>
+            @endif
             @if (auth()->user()->hasPermission('manage-permissions'))
                 <li>
                     <a href="{{ route('permissions.index') }}"

@@ -7,7 +7,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VotingCampaignController;
+use App\Http\Controllers\GroupController;
 use Illuminate\Support\Facades\Route;
+
 
 // Public routes
 Route::get('/', function () {
@@ -51,6 +53,11 @@ Route::middleware('auth')->group(function () {
     // User management routes
     Route::resource('users', UserController::class);
 
+    // Group management routes
+    Route::resource('groups', GroupController::class);
+    Route::post('groups/{group}/add-member', [GroupController::class, 'addMember'])->name('groups.addMember');
+    Route::delete('groups/{group}/remove-member/{user}', [GroupController::class, 'removeMember'])->name('groups.removeMember');
+
     // Role management routes
     Route::resource('roles', RoleController::class);
 
@@ -59,6 +66,12 @@ Route::middleware('auth')->group(function () {
 
     // Voting Campaign management routes
     Route::resource('voting-campaigns', VotingCampaignController::class);
+    Route::get('voting-campaigns/{votingCampaign}/positions', [VotingCampaignController::class, 'positions'])
+        ->name('voting-campaigns.positions');
+    Route::post('voting-campaigns/{votingCampaign}/positions', [VotingCampaignController::class, 'storePosition'])
+        ->name('voting-campaigns.positions.store');
+    Route::delete('voting-campaigns/{votingCampaign}/positions/{position}', [VotingCampaignController::class, 'deletePosition'])
+        ->name('voting-campaigns.positions.delete');
     Route::get('voting-campaigns/{votingCampaign}/candidates', [VotingCampaignController::class, 'candidates'])
         ->name('voting-campaigns.candidates');
     Route::post('voting-campaigns/{votingCampaign}/candidates', [VotingCampaignController::class, 'storeCandidate'])

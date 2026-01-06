@@ -13,8 +13,8 @@ class ResultsController extends Controller
     {
         $search = $request->get('search');
 
-        // Get all campaigns with their candidates and votes
-        $campaigns = VotingCampaign::with(['candidates', 'votes'])
+        // Get all campaigns with their candidates, positions, and votes
+        $campaigns = VotingCampaign::with(['candidates.positionRelation', 'positions.candidates', 'votes'])
             ->withCount(['candidates', 'votes'])
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {

@@ -83,6 +83,23 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="group_id" class="form-label">Group (Optional)</label>
+                        <select class="form-select @error('group_id') is-invalid @enderror" 
+                            id="group_id" name="group_id">
+                            <option value="">-- All Users (Public) --</option>
+                            @foreach($groups as $group)
+                                <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>
+                                    {{ $group->name }} {{ $group->is_private ? '(Private)' : '(Public)' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">If a private group is selected, only members can see and vote in this campaign</small>
+                        @error('group_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="allow_multiple_votes" 
                                 id="allow_multiple_votes" value="1" {{ old('allow_multiple_votes') ? 'checked' : '' }}>

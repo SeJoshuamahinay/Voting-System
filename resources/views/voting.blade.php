@@ -17,7 +17,7 @@
 
         .candidate-card {
             border: 1px solid #cfcfcf;
-            border-radius: 12px;
+            border-radius: 12px;D
             padding: 20px;
             transition: 0.2s ease;
             height: 100%;
@@ -138,7 +138,20 @@
             <div class="campaign-box {{ $campaign->isExpired() ? 'expired' : '' }}" data-category="{{ $campaign->category }}">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <h4 class="fw-bold mb-1">{{ $campaign->title }}</h4>
+                        <h4 class="fw-bold mb-1">
+                            {{ $campaign->title }}
+                            @if($campaign->group)
+                                @if($campaign->group->is_private)
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-lock-fill"></i> {{ $campaign->group->name }}
+                                    </span>
+                                @else
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-people-fill"></i> {{ $campaign->group->name }}
+                                    </span>
+                                @endif
+                            @endif
+                        </h4>
                         <p class="mb-2 text-muted">{{ $campaign->description }}</p>
                         <div>
                             <span class="badge bg-info">{{ ucfirst($campaign->category) }}</span>
@@ -192,49 +205,116 @@
                         @csrf
                         <input type="hidden" name="voting_campaign_id" value="{{ $campaign->id }}">
 
-                        <div class="row g-3">
-                            @foreach($campaign->candidates as $candidate)
-                                @php
-                                    $hasVotedForCandidate = $campaign->allow_multiple_votes && 
-                                        $campaign->hasUserVoted(auth()->id(), $candidate->id);
-                                @endphp
-                                <div class="col-md-6 col-lg-4">
-                                    <label class="w-100">
-                                        <div class="candidate-card d-flex gap-3 align-items-center {{ $hasVotedForCandidate ? 'border-success' : '' }}">
-                                            <div class="d-flex gap-3 align-items-center flex-grow-1">
-                                                @if($candidate->photo)
-                                                    <img src="{{ asset('storage/' . $candidate->photo) }}" 
-                                                        class="candidate-img" alt="{{ $candidate->name }}">
-                                                @else
-                                                    <div class="candidate-img d-flex align-items-center justify-content-center">
-                                                        <i class="bi bi-person fs-2"></i>
-                                                    </div>
-                                                @endif
+                        @if($campaign->positions->count() > 0)
+                            @foreach($campaign->positions as $position)
+                                <div class="mb-4">
+                                    <h5 class="fw-bold border-bottom pb-2">{{ $position->title }}</h5>
+                                    @if($position->description)
+                                        <p class="text-muted small mb-3">{{ $position->description }}</p>
+                                    @endif
+                                    
+                                    <div class="row g-3">
+                                        @foreach($position->candidates as $candidate)
+                                            @php
+                                                $hasVotedForCandidate = $campaign->allow_multiple_votes && 
+                                                    $campaign->hasUserVoted(auth()->id(), $candidate->id);
+                                            @endphp
+                                            <div class="col-md-6 col-lg-4">
+                                                <label class="w-100">
+                                                    <div class="candidate-card d-flex gap-3 align-items-center {{ $hasVotedForCandidate ? 'border-success' : '' }}">
+                                                        <div class="d-flex gap-3 align-items-center flex-grow-1">
+                                                            @if($candidate->photo)
+                                                                <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                                    class="candidate-img" alt="{{ $candidate->name }}">
+                                                            @else
+                                                                <div class="candidate-img d-flex align-items-center justify-content-center">
+                                                                    <i class="bi bi-person fs-2"></i>
+                                                                </div>
+                                                            @endif
 
-                                                <div class="flex-grow-1">
-                                                    <h6 class="fw-bold m-0">
-                                                        {{ $candidate->name }}
-                                                        @if($hasVotedForCandidate)
-                                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                                            <div class="flex-grow-1">
+                                                                <h6 class="fw-bold m-0">
+                                                                    {{ $candidate->name }}
+                                                                    @if($hasVotedForCandidate)
+                                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                                    @endif
+                                                                </h6>
+                                                                @if($candidate->party_list)
+                                                                    <small class="text-muted d-block">{{ $candidate->party_list }}</small>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            @if($campaign->allow_multiple_votes)
+                                                                <input type="checkbox" name="candidate_ids[]" 
+                                                                    value="{{ $candidate->id }}" 
+                                                                    {{ $hasVotedForCandidate ? 'disabled checked' : '' }}>
+                                                            @else
+                                                                <input type="radio" name="candidate_id_{{ $position->id }}" 
+                                                                    value="{{ $candidate->id }}" 
+                                                                    required>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            {{-- Fallback for campaigns without positions --}}
+                            <div class="row g-3">
+                                @foreach($campaign->candidates as $candidate)
+                                    @php
+                                        $hasVotedForCandidate = $campaign->allow_multiple_votes && 
+                                            $campaign->hasUserVoted(auth()->id(), $candidate->id);
+                                    @endphp
+                                    <div class="col-md-6 col-lg-4">
+                                        <label class="w-100">
+                                            <div class="candidate-card d-flex gap-3 align-items-center {{ $hasVotedForCandidate ? 'border-success' : '' }}">
+                                                <div class="d-flex gap-3 align-items-center flex-grow-1">
+                                                    @if($candidate->photo)
+                                                        <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                            class="candidate-img" alt="{{ $candidate->name }}">
+                                                    @else
+                                                        <div class="candidate-img d-flex align-items-center justify-content-center">
+                                                            <i class="bi bi-person fs-2"></i>
+                                                        </div>
+                                                    @endif
+
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="fw-bold m-0">
+                                                            {{ $candidate->name }}
+                                                            @if($hasVotedForCandidate)
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @endif
+                                                        </h6>
+                                                        <small class="text-muted d-block">{{ $candidate->position }}</small>
+                                                        @if($candidate->party_list)
+                                                            <small class="text-muted d-block">{{ $candidate->party_list }}</small>
                                                         @endif
-                                                    </h6>
-                                                    <small class="text-muted d-block">{{ $candidate->position }}</small>
-                                                    @if($candidate->party_list)
-                                                        <small class="text-muted d-block">{{ $candidate->party_list }}</small>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    @if($campaign->allow_multiple_votes)
+                                                        <input type="checkbox" name="candidate_ids[]" 
+                                                            value="{{ $candidate->id }}" 
+                                                            {{ $hasVotedForCandidate ? 'disabled checked' : '' }}>
+                                                    @else
+                                                        <input type="radio" name="candidate_id" 
+                                                            value="{{ $candidate->id }}" 
+                                                            required>
                                                     @endif
                                                 </div>
                                             </div>
-
-                                            <div>
-                                                <input type="radio" name="candidate_id" 
-                                                    value="{{ $candidate->id }}" 
-                                                    {{ $hasVotedForCandidate ? 'disabled' : 'required' }}>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            @endforeach
-                        </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
 
                         @if($campaign->candidates->count() > 0)
                             <div class="mt-3 text-end">

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -25,7 +27,8 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('users.create', compact('roles'));
+        $groups = \App\Models\Group::orderBy('name')->get();
+        return view('users.create', compact('roles', 'groups'));
     }
 
     /**
@@ -39,12 +42,14 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'group_id' => 'nullable|exists:groups,id',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'group_id' => $request->group_id,
         ]);
 
         if ($request->has('roles')) {
@@ -69,8 +74,9 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
+        $groups = \App\Models\Group::orderBy('name')->get();
         $user->load('roles');
-        return view('users.edit', compact('user', 'roles'));
+        return view('users.edit', compact('user', 'roles', 'groups'));
     }
 
     /**
@@ -84,11 +90,13 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'group_id' => 'nullable|exists:groups,id',
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'group_id' => $request->group_id,
         ]);
 
         if ($request->filled('password')) {
