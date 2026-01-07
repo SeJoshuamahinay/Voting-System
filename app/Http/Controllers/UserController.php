@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('roles')->paginate(10);
+        $users = User::with(['roles', 'groups'])->paginate(10);
         return view('users.index', compact('users'));
     }
 
@@ -42,6 +42,8 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'groups' => 'nullable|array',
+            'groups.*' => 'exists:groups,id',
             'group_id' => 'nullable|exists:groups,id',
         ]);
 
@@ -56,6 +58,11 @@ class UserController extends Controller
             $user->roles()->sync($request->roles);
         }
 
+        // Sync multiple groups
+        if ($request->has('groups')) {
+            $user->groups()->sync($request->groups);
+        }
+
         return redirect()->route('users.index')->with('success', 'User created successfully!');
     }
 
@@ -64,7 +71,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load('roles.permissions');
+        $user->load(['roles.permissions', 'groups']);
         return view('users.show', compact('user'));
     }
 
@@ -75,7 +82,7 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $groups = \App\Models\Group::orderBy('name')->get();
-        $user->load('roles');
+        $user->load(['roles', 'groups']);
         return view('users.edit', compact('user', 'roles', 'groups'));
     }
 
@@ -90,6 +97,8 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'groups' => 'nullable|array',
+            'groups.*' => 'exists:groups,id',
             'group_id' => 'nullable|exists:groups,id',
         ]);
 
@@ -109,6 +118,13 @@ class UserController extends Controller
             $user->roles()->sync($request->roles);
         } else {
             $user->roles()->detach();
+        }
+
+        // Sync multiple groups
+        if ($request->has('groups')) {
+            $user->groups()->sync($request->groups);
+        } else {
+            $user->groups()->detach();
         }
 
         return redirect()->route('users.index')->with('success', 'User updated successfully!');

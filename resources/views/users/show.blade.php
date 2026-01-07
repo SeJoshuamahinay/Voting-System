@@ -46,6 +46,18 @@
                         </td>
                     </tr>
                     <tr>
+                        <th>Groups</th>
+                        <td>
+                            @if($user->groups->count() > 0)
+                                @foreach($user->groups as $group)
+                                    <span class="badge bg-success me-1">{{ $group->name }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-muted">No groups assigned</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
                         <th>Created At</th>
                         <td>{{ $user->created_at->format('M d, Y H:i:s') }}</td>
                     </tr>
@@ -84,6 +96,32 @@
                         </tbody>
                     </table>
                 </div>
+
+                <h4 class="mt-4">Assigned Groups ({{ $user->groups->count() }})</h4>
+                @if($user->groups->count() > 0)
+                    <div class="row">
+                        @foreach($user->groups as $group)
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-collection text-success me-2"></i>
+                                            {{ $group->name }}
+                                        </h5>
+                                        @if($group->description)
+                                            <p class="card-text text-muted">{{ $group->description }}</p>
+                                        @endif
+                                        <small class="text-muted">
+                                            <i class="bi bi-people"></i> {{ $group->users->count() }} member(s)
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-muted">No groups assigned to this user.</p>
+                @endif
 
                 @if($user->roles->count() > 0)
                     <h4 class="mt-4">All Permissions</h4>

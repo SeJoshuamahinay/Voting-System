@@ -9,9 +9,14 @@
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Users Management</h2>
-            <a href="{{ route('users.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create New User
-            </a>
+            <div>
+                <a href="{{ route('user-groups.index') }}" class="btn btn-info me-2">
+                    <i class="bi bi-people-fill"></i> Manage User Groups
+                </a>
+                <a href="{{ route('users.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create New User
+                </a>
+            </div>
         </div>
 
         <div class="card">
@@ -24,6 +29,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Roles</th>
+                                <th>Groups</th>
                                 <th>Created At</th>
                                 <th>Actions</th>
                             </tr>
@@ -50,20 +56,33 @@
                                             <span class="badge bg-secondary">No Role</span>
                                         @endif
                                     </td>
+                                    <td>
+                                        @if($user->groups->count() > 0)
+                                            @foreach($user->groups as $group)
+                                                <span class="badge bg-success me-1" title="{{ $group->description }}">{{ $group->name }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small">No groups</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                                     <td>
-                                        <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info">
+                                        <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning" title="Edit">
                                             <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ route('user-groups.edit', $user) }}" class="btn btn-sm btn-success" title="Manage Groups">
+                                            <i class="bi bi-collection"></i>
                                         </a>
                                         @if($user->id !== auth()->id())
                                             <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                    onclick="return confirm('Are you sure you want to delete this user?')"
+                                                    title="Delete">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -72,7 +91,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">No users found.</td>
+                                    <td colspan="7" class="text-center">No users found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

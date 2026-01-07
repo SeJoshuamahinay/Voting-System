@@ -12,8 +12,20 @@ class Group extends Model
         'is_private',
     ];
 
-    public function users()
+    /**
+     * Get users with single group assignment (legacy).
+     */
+    public function usersLegacy()
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Get all users in this group (many-to-many).
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_group')
+                    ->withTimestamps();
     }
 }
