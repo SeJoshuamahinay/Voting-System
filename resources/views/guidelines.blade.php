@@ -19,41 +19,141 @@
     </div>
 
     <!-- Frequently Asked Questions -->
-    <div class="row justify-content-center mb-5">
-        <div class="col-lg-8">
-            <h2 class="mb-4 text-center">Frequently Asked Questions</h2>
-            <div class="accordion" id="faqAccordion">
-                @for ($i = 1; $i <= 5; $i++)
-                <div class="accordion-item mb-3">
-                    <h2 class="accordion-header" id="heading{{ $i }}">
-                        <button class="accordion-button {{ $i > 1 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $i }}" aria-expanded="{{ $i == 1 ? 'true' : 'false' }}" aria-controls="collapse{{ $i }}">
-                            <strong>FAQ Question {{ $i }} (alt for icon)</strong>
-                        </button>
-                    </h2>
-                    <div id="collapse{{ $i }}" class="accordion-collapse collapse {{ $i == 1 ? 'show' : '' }}" aria-labelledby="heading{{ $i }}" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.
-                        </div>
-                    </div>
+    @extends('layouts.app')
+
+@section('content')
+<div class="container py-5">
+    <h1 class="text-center mb-5">Guidelines</h1>
+
+    <div class="row">
+        {{-- Left Column --}}
+        <div class="col-md-6">
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>What are the community rules?</span>
+                    <span class="arrow">▼</span>
                 </div>
-                @endfor
+                <div class="faq-answer mt-2 text-muted d-none">
+                    Our rules promote respect, safety, and constructive engagement across all interactions.
+                </div>
+            </div>
+
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>How is user safety maintained?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    We use moderation tools, reporting systems, and proactive monitoring to ensure safety.
+                </div>
+            </div>
+
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>Are there content restrictions?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    Yes, content must comply with our terms—no hate speech, harassment, or illegal material.
+                </div>
+            </div>
+
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>Can guidelines change over time?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    Absolutely. We update guidelines to reflect evolving standards and community needs.
+                </div>
+            </div>
+        </div>
+
+        {{-- Right Column --}}
+        <div class="col-md-6">
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>Who enforces the guidelines?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    Our moderation team and automated systems work together to enforce rules fairly.
+                </div>
+            </div>
+
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>What happens if rules are broken?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    Violations may result in warnings, suspensions, or permanent bans depending on severity.
+                </div>
+            </div>
+
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>Can I report violations anonymously?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    Yes, anonymous reporting is available to protect your identity and encourage safe reporting.
+                </div>
+            </div>
+
+            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                <div class="faq-question d-flex justify-content-between align-items-center">
+                    <span>How often are guidelines reviewed?</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="faq-answer mt-2 text-muted d-none">
+                    We review them quarterly and after major platform updates or community feedback.
+                </div>
             </div>
         </div>
     </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.faq-item').forEach(item => {
+        item.addEventListener('click', () => {
+            item.classList.toggle('active');
+            const answer = item.querySelector('.faq-answer');
+            const arrow = item.querySelector('.arrow');
+            answer.classList.toggle('d-none');
+            arrow.style.transform = item.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+    });
+</script>
+@endpush
+
 
     <!-- Voters Guidelines -->
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h2 class="mb-4">Voters Guidelines</h2>
-            <ul class="list-group list-group-flush">
-                @for ($j = 1; $j <= 7; $j++)
+    <div class="col-lg-8">
+        <h2 class="mb-4">Voters Guidelines</h2>
+        <ul class="list-group list-group-flush">
+            @php
+                $guidelines = [
+                    "Check your voter registration before the election.",
+                    "Bring a valid ID to the polling station.",
+                    "Vote only once and follow the official procedures.",
+                    "Respect other voters and maintain order.",
+                    "Follow all instructions given by election staff.",
+                    "Ensure your ballot is filled out clearly and correctly.",
+                    "Report any irregularities to the proper authorities."
+                ];
+            @endphp
+
+            @foreach ($guidelines as $index => $guideline)
                 <li class="list-group-item d-flex align-items-center">
-                    <img src="your-guideline-icon.jpg" alt="Guideline icon {{ $j }}" class="me-3" style="width:32px; height:32px;" />
-                    diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in.
+                    <img src="/assets/guideline.png" alt="Guideline icon {{ $index + 1 }}" class="me-3" style="width:32px; height:32px;" />
+                    {{ $guideline }}
                 </li>
-                @endfor
-            </ul>
-        </div>
+            @endforeach
+        </ul>
     </div>
 </div>
 
