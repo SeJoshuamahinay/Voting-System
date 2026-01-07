@@ -63,8 +63,7 @@
             <p class="mt-3" style="max-width: 750px; margin: auto;">
                 Vote2Voice is a secure, transparent, and flexible digital voting system designed specifically for small communities such as CvSU-Bacoor. The system aims to modernize the voting process by replacing traditional manual methods with a reliable digital platform that prioritizes security, efficiency, and user experience.
 
-By leveraging account-based access, encrypted voting, real-time analytics, and automated reporting, Vote2Voice ensures that elections are conducted fairly, accurately, and transparently. The platform is designed to support different types of voting scenarios while maintaining voter privacy and election integrity.
-            </p>
+           </p>
         </div>
     </section>
 
@@ -105,7 +104,7 @@ By leveraging account-based access, encrypted voting, real-time analytics, and a
 
                 <div class="col-md-4">
                     <div class="feature-icon">
-                        <img src="/assets/icons/vote.png" width="80">
+                        <img src="/assets/vote.png" width="80">
                     </div>
                     <h6>Vote Online</h6>
                     <p class="small">
@@ -115,7 +114,7 @@ By leveraging account-based access, encrypted voting, real-time analytics, and a
 
                 <div class="col-md-4">
                     <div class="feature-icon">
-                        <img src="/assets/icons/security.png" width="80">
+                        <img src="/assets/security.png" width="80">
                     </div>
                     <h6>Secured Platform</h6>
                     <p class="small">
@@ -128,58 +127,51 @@ By leveraging account-based access, encrypted voting, real-time analytics, and a
 
 
     {{-- PROCESS STEPS --}}
-    <section class="py-5">
+    <section class="py-5 bg-light">
         <div class="container text-center">
-            <h4 class="fw-bold">How Vote2Voice Works</h4>
-            <p class="small text-muted mb-5">A Simple Way to Secure Your Vote</p>
-
-            <div class="row g-4">
-
-                {{-- STEP 1 --}}
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <img src="{{ asset('assets/tests.png') }}" alt="Vote2Voice Logo" width="150" class="me-2">
-                        <div class="p-3 text-start">
-                            <h6>Create Your Account</h6>
-                            <p class="small">
-                                Join our secure platform in seconds. Verify your credentials and ensure only you can
-                                cast your vote.
-                            </p>
-                            <a href="#" class="small">See More →</a>
+            <h3 class="fw-bold mb-4">How Vote2Voice Works</h3>
+            <div class="row g-10">
+                <div class="row g-20">
+                    <div class="col-md-4 border rounded border-black">
+                        <!-- top container row with detail and logo -->
+                        <div>
+                            <i class="bi bi-person-plus-fill fs-1 mb-3 d-block"></i>
+                            <h5 class="fw-bold">Create Your Account</h5>
+                            <p>Your verified account ensures one person, one vote.</p>
+                            <a href="#" class="text-white text-decoration-none fw-bold">See More →</a>
+                        </div>
+                          <!-- bottom container row with image bg-->
+                         <div>
+                            <img src="{{ asset('assets/create.png') }}" alt="Create Account Illustration" class="img-fluid ">
+                        </div>
+                    </div>
+                    <div class="col-md-4 border rounded border-black">
+                        <!-- top container row with detail and logo -->
+                        <div>
+                            <i class="bi bi-check2-square fs-1 mb-3 d-block"></i>
+                            <h5 class="fw-bold">Cast Your Vote</h5>
+                            <p>Your vote is encrypted, traceable, and tamper-proof.</p>
+                            <a href="#" class="text-white text-decoration-none fw-bold">See More →</a>
+                        </div>
+                        <div>
+                            <img src="{{ asset('assets/cast.png') }}" alt="Cast Vote Illustration" class="img-fluid ">
+                        </div>
+                    </div>
+                    <div class="col-md-4 border rounded border-black">
+                        <!-- top container row with detail and logo -->
+                        <div>
+                            <i class="bi bi-bar-chart-fill fs-1 mb-3 d-block"></i>
+                            <h5 class="fw-bold">View Results</h5>
+                            <p>Results are displayed instantly with real-time summaries.</p>
+                            <a href="#" class="text-white text-decoration-none fw-bold">See More →</a>
+                        </div>
+                        <div>
+                            <img src="{{ asset('assets/results.png') }}" alt="View Results Illustration"
+                                class="img-fluid ">
                         </div>
                     </div>
                 </div>
-
-                {{-- STEP 2 --}}
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <img src="/assets/steps/vote.png">
-                        <div class="p-3 text-start">
-                            <h6>Cast Your Vote</h6>
-                            <p class="small">
-                                Make your choice with one click. Your vote is encrypted, traceable, and tamper-proof.
-                            </p>
-                            <a href="#" class="small">See More →</a>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- STEP 3 --}}
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <img src="/assets/steps/results.png">
-                        <div class="p-3 text-start">
-                            <h6>View Results</h6>
-                            <p class="small">
-                                Results are displayed instantly with transparency—no waiting, no doubts.
-                            </p>
-                            <a href="#" class="small">See More →</a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </div>
     </section>
 
 
