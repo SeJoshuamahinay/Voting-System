@@ -8,146 +8,115 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
-{{-- NAVIGATION --}}
-@include('nav')
-<div class="container py-5">
-    <!-- FAQ Header with Image -->
-    <div class="row mb-5 justify-content-center align-items-center">
-        <div class="col-auto text-center">
-            <img src="{{ asset('assets/faq.png') }}" class="img-fluid" alt="FAQ illustration" />
-        </div>
-    </div>
 
     <!-- Frequently Asked Questions -->
     @extends('layouts.app')
 
-@section('content')
+@section('content') 
 <div class="container py-5">
-    <h1 class="text-center mb-5">Guidelines</h1>
+    <h1 class="text-center mb-5">Frequently Asked Questions</h1>
 
     <div class="row">
         {{-- Left Column --}}
         <div class="col-md-6">
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>What are the community rules?</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    Our rules promote respect, safety, and constructive engagement across all interactions.
-                </div>
-            </div>
+            @php
+                $faqsLeft = [
+                    ["question" => "What are the community rules?", "answer" => "Our rules promote respect, safety, and constructive engagement across all interactions."],
+                    ["question" => "How is user safety maintained?", "answer" => "We use moderation tools, reporting systems, and proactive monitoring to ensure safety."],
+                    ["question" => "Are there content restrictions?", "answer" => "Yes, content must comply with our terms—no hate speech, harassment, or illegal material."],
+                    ["question" => "Can guidelines change over time?", "answer" => "Absolutely. We update guidelines to reflect evolving standards and community needs."]
+                ];
+            @endphp
 
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>How is user safety maintained?</span>
-                    <span class="arrow">▼</span>
+            @foreach($faqsLeft as $faq)
+                <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                    <div class="faq-question d-flex justify-content-between align-items-center" style="cursor:pointer;">
+                        <span>{{ $faq['question'] }}</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="faq-answer mt-2 text-muted d-none">
+                        {{ $faq['answer'] }}
+                    </div>
                 </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    We use moderation tools, reporting systems, and proactive monitoring to ensure safety.
-                </div>
-            </div>
-
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>Are there content restrictions?</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    Yes, content must comply with our terms—no hate speech, harassment, or illegal material.
-                </div>
-            </div>
-
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>Can guidelines change over time?</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    Absolutely. We update guidelines to reflect evolving standards and community needs.
-                </div>
-            </div>
+            @endforeach
         </div>
 
         {{-- Right Column --}}
         <div class="col-md-6">
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>Who enforces the guidelines?</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    Our moderation team and automated systems work together to enforce rules fairly.
-                </div>
-            </div>
+            @php
+                $faqsRight = [
+                    ["question" => "Who enforces the guidelines?", "answer" => "Our moderation team and automated systems work together to enforce rules fairly."],
+                    ["question" => "What happens if rules are broken?", "answer" => "Violations may result in warnings, suspensions, or permanent bans depending on severity."],
+                    ["question" => "Can I report violations anonymously?", "answer" => "Yes, anonymous reporting is available to protect your identity and encourage safe reporting."],
+                    ["question" => "How often are guidelines reviewed?", "answer" => "We review them quarterly and after major platform updates or community feedback."]
+                ];
+            @endphp
 
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>What happens if rules are broken?</span>
-                    <span class="arrow">▼</span>
+            @foreach($faqsRight as $faq)
+                <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
+                    <div class="faq-question d-flex justify-content-between align-items-center" style="cursor:pointer;">
+                        <span>{{ $faq['question'] }}</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="faq-answer mt-2 text-muted d-none">
+                        {{ $faq['answer'] }}
+                    </div>
                 </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    Violations may result in warnings, suspensions, or permanent bans depending on severity.
-                </div>
-            </div>
-
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>Can I report violations anonymously?</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    Yes, anonymous reporting is available to protect your identity and encourage safe reporting.
-                </div>
-            </div>
-
-            <div class="faq-item mb-3 p-3 bg-white shadow-sm rounded">
-                <div class="faq-question d-flex justify-content-between align-items-center">
-                    <span>How often are guidelines reviewed?</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div class="faq-answer mt-2 text-muted d-none">
-                    We review them quarterly and after major platform updates or community feedback.
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
-@endsection
 
+{{-- FAQ Toggle Script --}}
 @push('scripts')
 <script>
-    document.querySelectorAll('.faq-item').forEach(item => {
-        item.addEventListener('click', () => {
-            item.classList.toggle('active');
-            const answer = item.querySelector('.faq-answer');
-            const arrow = item.querySelector('.arrow');
+document.addEventListener('DOMContentLoaded', function() {
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        const arrow = item.querySelector('.arrow');
+
+        question.addEventListener('click', () => {
             answer.classList.toggle('d-none');
-            arrow.style.transform = item.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+            arrow.textContent = answer.classList.contains('d-none') ? '▼' : '▲';
         });
     });
+});
 </script>
 @endpush
+
+{{-- Optional CSS for smooth dropdown --}}
+@push('styles')
+<style>
+.faq-answer {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+</style>
+@endpush
+@endsection
+
 
 
     <!-- Voters Guidelines -->
     <div class="row justify-content-center">
     <div class="col-lg-8">
-        <h2 class="mb-4">Voters Guidelines</h2>
+        <h2 class="mb-4">Voter Guidelines</h2>
         <ul class="list-group list-group-flush">
             @php
                 $guidelines = [
-                    "Check your voter registration before the election.",
-                    "Bring a valid ID to the polling station.",
-                    "Vote only once and follow the official procedures.",
-                    "Respect other voters and maintain order.",
-                    "Follow all instructions given by election staff.",
-                    "Ensure your ballot is filled out clearly and correctly.",
-                    "Report any irregularities to the proper authorities."
-                ];
+                    "Ensure your account is registered and verified before the election to vote securely.",
+                    "Each voter can only vote once per election. Multiple votes are allowed per position.",
+                    "Follow the official election period. Votes outside the designated start and end times will not be counted.",
+                    "Check candidate information before voting to make an informed decision.",
+                    "Fraudulent activity or vote manipulation is prohibited. The system monitors suspicious behavior automatically.",
+                    "After voting, you will receive a confirmation for transparency and verification.",
+                    "Detailed reports summarizing total votes, turnout, and election outcomes are available for review after the election concludes."
+              ];
             @endphp
 
-            @foreach ($guidelines as $index => $guideline)
+            @foreach($guidelines as $index => $guideline)
                 <li class="list-group-item d-flex align-items-center">
                     <img src="/assets/guideline.png" alt="Guideline icon {{ $index + 1 }}" class="me-3" style="width:32px; height:32px;" />
                     {{ $guideline }}
@@ -156,6 +125,7 @@
         </ul>
     </div>
 </div>
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
