@@ -61,8 +61,9 @@
             <h2>About Vote2Voice</h2>
 
             <p class="mt-3" style="max-width: 750px; margin: auto;">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse lectus tortor,
-                dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam.
+                Vote2Voice is a secure, transparent, and flexible digital voting system designed specifically for small communities such as CvSU-Bacoor. The system aims to modernize the voting process by replacing traditional manual methods with a reliable digital platform that prioritizes security, efficiency, and user experience.
+
+By leveraging account-based access, encrypted voting, real-time analytics, and automated reporting, Vote2Voice ensures that elections are conducted fairly, accurately, and transparently. The platform is designed to support different types of voting scenarios while maintaining voter privacy and election integrity.
             </p>
         </div>
     </section>
@@ -75,10 +76,7 @@
 
             <div class="mission-box">
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse lectus tortor,
-                    dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam.
-                    Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec
-                    nonummy molestie, enim est eleifend mi.
+                    The mission of Vote2Voice is to provide a secure, transparent, and reliable digital voting platform that empowers small communities to conduct fair and efficient elections. The system aims to uphold the integrity of the voting process by enforcing one-person-one-vote principles, protecting voter privacy through encryption and anonymity, and delivering accurate results through real-time vote counting and automated reporting.
                 </p>
             </div>
         </div>
@@ -91,8 +89,7 @@
             <h4 class="fw-bold mb-2">Our Features</h4>
 
             <p class="mb-5" style="max-width: 700px; margin: auto;">
-                Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue,
-                euismod non, mi. Proin porttitor, orci nec nonummy molestie.
+                Ensures that only authorized users can participate in the voting process, providing a secure login mechanism for voters.
             </p>
 
             <div class="row g-5">
@@ -102,7 +99,7 @@
                     </div>
                     <h6>Real Time Results</h6>
                     <p class="small">
-                        Dolor. Cras elementum ultricies diam. Maecenas ligula massa.
+                        Allows for the immediate tallying of votes once the voting period ends.
                     </p>
                 </div>
 
@@ -112,7 +109,7 @@
                     </div>
                     <h6>Vote Online</h6>
                     <p class="small">
-                        Elementum ultricies diam. Maecenas ligula massa.
+                         Provides flexibility in the types of elections that can be held within the platform.
                     </p>
                 </div>
 
@@ -122,7 +119,7 @@
                     </div>
                     <h6>Secured Platform</h6>
                     <p class="small">
-                        Ligula massa, varius a, semper congue, euismod.
+                        Ensures that only authorized users can participate in the voting process, providing a secure login mechanism for voters.
                     </p>
                 </div>
             </div>
