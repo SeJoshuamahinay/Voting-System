@@ -8,6 +8,9 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         .hero-bg {
@@ -133,6 +136,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
+        
+        @if(session('download_receipt'))
+            <script>
+                // Auto-download receipt and show success message with SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Vote Submitted Successfully!',
+                    html: 'Your vote has been recorded. Your receipt is downloading now...<br><br><small>If download doesn\'t start, <a href="{{ route("vote.receipt") }}" class="text-primary"><strong>click here</strong></a></small>',
+                    confirmButtonColor: '#6f42c1',
+                    confirmButtonText: 'OK',
+                    timer: 5000,
+                    didOpen: () => {
+                        // Trigger automatic download
+                        window.location.href = '{{ route("vote.receipt") }}';
+                    }
+                });
+            </script>
+        @endif
 
         @forelse($campaigns as $campaign)
             <div class="campaign-box {{ $campaign->isExpired() ? 'expired' : '' }}" data-category="{{ $campaign->category }}">
@@ -195,17 +216,35 @@
                     <div class="alert alert-success mb-0">
                         <i class="bi bi-check-circle"></i> You have already voted in this campaign. Thank you!
                     </div>
-                @else
-                    @if($campaign->allow_multiple_votes)
+                @elseif($campaign->allow_multiple_votes)
+                    @php
+                        // Check if user has voted for all candidates
+                        $totalCandidates = $campaign->candidates->count();
+                        $votedCandidatesCount = $campaign->votes()->where('user_id', auth()->id())->count();
+                        $hasVotedForAll = $totalCandidates > 0 && $votedCandidatesCount >= $totalCandidates;
+                        
+                        // Check if there are any candidates left to vote for
+                        $availableCandidates = $campaign->candidates->filter(function($candidate) use ($campaign) {
+                            return !$campaign->hasUserVoted(auth()->id(), $candidate->id);
+                        });
+                    @endphp
+                    
+                    @if($hasVotedForAll || $availableCandidates->count() === 0)
+                        <div class="alert alert-success mb-0">
+                            <i class="bi bi-check-circle-fill"></i> <strong>Voting Complete!</strong> You have voted for all available candidates in this campaign. Thank you for participating!
+                        </div>
+                    @else
                         <div class="alert alert-info mb-3">
                             <i class="bi bi-info-circle"></i> <strong>Multiple votes allowed:</strong> You can vote for multiple candidates in this campaign.
+                            @if($votedCandidatesCount > 0)
+                                <br><small>You have cast {{ $votedCandidatesCount }} vote(s) so far. {{ $availableCandidates->count() }} candidate(s) remaining.</small>
+                            @endif
                         </div>
-                    @endif
-                    <form action="{{ route('vote.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="voting_campaign_id" value="{{ $campaign->id }}">
+                        <form action="{{ route('vote.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="voting_campaign_id" value="{{ $campaign->id }}">
 
-                        @if($campaign->positions->count() > 0)
+                            @if($campaign->positions->count() > 0)
                             @foreach($campaign->positions as $position)
                                 <div class="mb-4">
                                     <h5 class="fw-bold border-bottom pb-2">{{ $position->title }}</h5>
@@ -328,6 +367,106 @@
                             </div>
                         @endif
                     </form>
+                    @endif
+                @else
+                    {{-- Single vote campaign with no vote yet --}}
+                    <form action="{{ route('vote.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="voting_campaign_id" value="{{ $campaign->id }}">
+
+                        @if($campaign->positions->count() > 0)
+                            @foreach($campaign->positions as $position)
+                                <div class="mb-4">
+                                    <h5 class="fw-bold border-bottom pb-2">{{ $position->title }}</h5>
+                                    @if($position->description)
+                                        <p class="text-muted small mb-3">{{ $position->description }}</p>
+                                    @endif
+                                    
+                                    <div class="row g-3">
+                                        @foreach($position->candidates as $candidate)
+                                            <div class="col-md-6 col-lg-4">
+                                                <label class="w-100">
+                                                    <div class="candidate-card d-flex gap-3 align-items-center">
+                                                        <div class="d-flex gap-3 align-items-center flex-grow-1">
+                                                            @if($candidate->photo)
+                                                                <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                                    class="candidate-img" alt="{{ $candidate->name }}">
+                                                            @else
+                                                                <div class="candidate-img d-flex align-items-center justify-content-center">
+                                                                    <i class="bi bi-person fs-2"></i>
+                                                                </div>
+                                                            @endif
+
+                                                            <div class="flex-grow-1">
+                                                                <h6 class="fw-bold m-0">{{ $candidate->name }}</h6>
+                                                                @if($candidate->party_list)
+                                                                    <small class="text-muted d-block">{{ $candidate->party_list }}</small>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <input type="radio" name="candidate_id_{{ $position->id }}" 
+                                                                value="{{ $candidate->id }}" 
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            {{-- Fallback for campaigns without positions --}}
+                            <div class="row g-3">
+                                @foreach($campaign->candidates as $candidate)
+                                    <div class="col-md-6 col-lg-4">
+                                        <label class="w-100">
+                                            <div class="candidate-card d-flex gap-3 align-items-center">
+                                                <div class="d-flex gap-3 align-items-center flex-grow-1">
+                                                    @if($candidate->photo)
+                                                        <img src="{{ asset('storage/' . $candidate->photo) }}" 
+                                                            class="candidate-img" alt="{{ $candidate->name }}">
+                                                    @else
+                                                        <div class="candidate-img d-flex align-items-center justify-content-center">
+                                                            <i class="bi bi-person fs-2"></i>
+                                                        </div>
+                                                    @endif
+
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="fw-bold m-0">{{ $candidate->name }}</h6>
+                                                        <small class="text-muted d-block">{{ $candidate->position }}</small>
+                                                        @if($candidate->party_list)
+                                                            <small class="text-muted d-block">{{ $candidate->party_list }}</small>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <input type="radio" name="candidate_id" 
+                                                        value="{{ $candidate->id }}" 
+                                                        required>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @if($campaign->candidates->count() > 0)
+                            <div class="mt-3 text-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-check-circle"></i> Submit Vote
+                                </button>
+                            </div>
+                        @else
+                            <div class="alert alert-info mb-0 mt-3">
+                                No candidates available for this campaign yet.
+                            </div>
+                        @endif
+                    </form>
                 @endif
             </div>
         @empty
@@ -360,6 +499,104 @@
                 } else {
                     box.style.display = 'none';
                 }
+            });
+        });
+    });
+
+    // Vote confirmation with SweetAlert2
+    document.addEventListener('DOMContentLoaded', function() {
+        const voteForms = document.querySelectorAll('form[action="{{ route('vote.store') }}"]');
+        
+        voteForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Check if at least one candidate is selected
+                const radioInputs = form.querySelectorAll('input[type="radio"]:checked');
+                const checkboxInputs = form.querySelectorAll('input[type="checkbox"]:checked:not([disabled])');
+                
+                if (radioInputs.length === 0 && checkboxInputs.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No Selection',
+                        text: 'Please select at least one candidate before submitting your vote.',
+                        confirmButtonColor: '#6f42c1'
+                    });
+                    return;
+                }
+                
+                // Get campaign title from the form's parent campaign box
+                const campaignBox = form.closest('.campaign-box');
+                const campaignTitle = campaignBox.querySelector('h4').textContent.trim();
+                
+                // Collect selected candidates details
+                const selectedCandidates = [];
+                
+                // Process radio inputs
+                radioInputs.forEach(input => {
+                    const candidateCard = input.closest('.candidate-card');
+                    const candidateName = candidateCard.querySelector('h6').textContent.trim();
+                    const positionLabel = candidateCard.closest('.mb-4').querySelector('h5');
+                    const positionName = positionLabel ? positionLabel.textContent.trim() : 'Main Candidate';
+                    
+                    selectedCandidates.push({
+                        name: candidateName,
+                        position: positionName
+                    });
+                });
+                
+                // Process checkbox inputs
+                checkboxInputs.forEach(input => {
+                    const candidateCard = input.closest('.candidate-card');
+                    const candidateName = candidateCard.querySelector('h6').textContent.trim();
+                    const positionLabel = candidateCard.closest('.mb-4')?.querySelector('h5');
+                    const positionName = positionLabel ? positionLabel.textContent.trim() : 'Candidate';
+                    
+                    selectedCandidates.push({
+                        name: candidateName,
+                        position: positionName
+                    });
+                });
+                
+                // Build HTML list of selected candidates
+                let candidatesListHTML = '<div class="text-start mt-3 mb-3" style="max-height: 300px; overflow-y: auto;">';
+                candidatesListHTML += '<strong>Your Selected Votes:</strong><ul class="mt-2">';
+                selectedCandidates.forEach(candidate => {
+                    candidatesListHTML += `<li><strong>${candidate.name}</strong> - <em>${candidate.position}</em></li>`;
+                });
+                candidatesListHTML += '</ul></div>';
+                
+                const selectedCount = radioInputs.length + checkboxInputs.length;
+                const candidateText = selectedCount === 1 ? 'candidate' : 'candidates';
+                
+                Swal.fire({
+                    title: 'Confirm Your Vote',
+                    html: `You are about to submit your vote for <strong>${selectedCount} ${candidateText}</strong> in "<strong>${campaignTitle}</strong>".${candidatesListHTML}<small class="text-danger"><i class="bi bi-exclamation-triangle"></i> This action cannot be undone.</small>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#6f42c1',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="bi bi-check-circle"></i> Yes, Submit My Vote',
+                    cancelButtonText: '<i class="bi bi-x-circle"></i> Cancel',
+                    reverseButtons: true,
+                    width: '600px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading
+                        Swal.fire({
+                            title: 'Submitting Your Vote...',
+                            text: 'Please wait',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Submit the form
+                        form.submit();
+                    }
+                });
             });
         });
     });

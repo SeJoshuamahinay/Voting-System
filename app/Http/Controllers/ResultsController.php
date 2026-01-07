@@ -12,10 +12,27 @@ class ResultsController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
+        $user = auth()->user();
 
         // Get all campaigns with their candidates, positions, and votes
-        $campaigns = VotingCampaign::with(['candidates.positionRelation', 'positions.candidates', 'votes'])
+        $campaigns = VotingCampaign::with(['candidates.positionRelation', 'positions.candidates', 'votes', 'group'])
             ->withCount(['candidates', 'votes'])
+            ->where(function ($query) use ($user) {
+                // Show campaigns with no group (public to all)
+                $query->whereNull('group_id')
+                    // OR campaigns with public groups
+                    ->orWhereHas('group', function ($q) {
+                        $q->where('is_private', false);
+                    });
+                
+                // If user is logged in, also show private group campaigns they're a member of
+                if ($user) {
+                    $query->orWhereHas('group', function ($q) use ($user) {
+                        $q->where('is_private', true)
+                          ->where('id', $user->group_id);
+                    });
+                }
+            })
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
@@ -53,9 +70,28 @@ class ResultsController extends Controller
 
     public function show($id)
     {
-        $campaign = VotingCampaign::with('candidates')
+        $user = auth()->user();
+        
+        $campaign = VotingCampaign::with(['candidates', 'group'])
             ->withCount('votes')
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->where(function ($query) use ($user) {
+                // Show campaigns with no group (public to all)
+                $query->whereNull('group_id')
+                    // OR campaigns with public groups
+                    ->orWhereHas('group', function ($q) {
+                        $q->where('is_private', false);
+                    });
+                
+                // If user is logged in, also show private group campaigns they're a member of
+                if ($user) {
+                    $query->orWhereHas('group', function ($q) use ($user) {
+                        $q->where('is_private', true)
+                          ->where('id', $user->group_id);
+                    });
+                }
+            })
+            ->firstOrFail();
 
         // Get analytics data
         $analytics = [

@@ -8,6 +8,7 @@ use App\Models\Vote;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VoteController extends Controller
 {
@@ -151,8 +152,18 @@ class VoteController extends Controller
                         ['votes_count' => $votesCreated, 'candidate_ids' => $candidateIds]
                     );
                     
+                    // Store vote details in session for receipt generation
+                    session([
+                        'vote_receipt_data' => [
+                            'campaign_id' => $campaign->id,
+                            'candidate_ids' => $candidateIds,
+                            'votes_count' => $votesCreated
+                        ]
+                    ]);
+                    
                     return redirect()->route('voting.index')
-                        ->with('success', "Successfully cast {$votesCreated} vote(s)!");
+                        ->with('success', "Successfully cast {$votesCreated} vote(s)!")
+                        ->with('download_receipt', true);
                 } else {
                     return redirect()->back()->with('error', 'You have already voted for all selected candidates!');
                 }
@@ -206,17 +217,58 @@ class VoteController extends Controller
                     ['votes_count' => $votesCreated, 'candidate_ids' => $candidateIds]
                 );
 
-                if ($votesCreated === 1) {
-                    return redirect()->route('voting.index')
-                        ->with('success', 'Your vote has been cast successfully!');
-                } else {
-                    return redirect()->route('voting.index')
-                        ->with('success', "Successfully cast {$votesCreated} votes!");
-                }
+                // Store vote details in session for receipt generation
+                session([
+                    'vote_receipt_data' => [
+                        'campaign_id' => $campaign->id,
+                        'candidate_ids' => $candidateIds,
+                        'votes_count' => $votesCreated
+                    ]
+                ]);
+                
+                return redirect()->route('voting.index')
+                    ->with('success', $votesCreated === 1 ? 'Your vote has been cast successfully!' : "Successfully cast {$votesCreated} votes!")
+                    ->with('download_receipt', true);
             }
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Failed to cast vote. Please try again.');
         }
+    }
+
+    /**
+     * Generate PDF receipt for the vote.
+     */
+    public function downloadReceipt()
+    {
+        $receiptData = session('vote_receipt_data');
+        
+        if (!$receiptData) {
+            return redirect()->route('voting.index')->with('error', 'Receipt data not found.');
+        }
+
+        $campaign = VotingCampaign::findOrFail($receiptData['campaign_id']);
+        $votedCandidates = Candidate::whereIn('id', $receiptData['candidate_ids'])->with('positionRelation')->get();
+        
+        $user = auth()->user();
+        $voteDate = now();
+        $receiptNumber = 'VR-' . $campaign->id . '-' . $user->id . '-' . time();
+
+        $data = [
+            'campaign' => $campaign,
+            'candidates' => $votedCandidates,
+            'user' => $user,
+            'voteDate' => $voteDate,
+            'receiptNumber' => $receiptNumber,
+        ];
+
+        // Clear the session data
+        session()->forget('vote_receipt_data');
+
+        $pdf = Pdf::loadView('receipts.vote-receipt', $data);
+        
+        $fileName = 'Vote_Receipt_' . $campaign->id . '_' . time() . '.pdf';
+        
+        return $pdf->download($fileName);
     }
 }

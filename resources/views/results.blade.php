@@ -103,7 +103,20 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <h4 class="fw-bold mb-1">{{ $campaign->title }}</h4>
+                        <h4 class="fw-bold mb-1">
+                            {{ $campaign->title }}
+                            @if($campaign->group)
+                                @if($campaign->group->is_private)
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-lock-fill"></i> {{ $campaign->group->name }}
+                                    </span>
+                                @else
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-people-fill"></i> {{ $campaign->group->name }}
+                                    </span>
+                                @endif
+                            @endif
+                        </h4>
                         <p class="text-muted mb-2">{{ $campaign->description }}</p>
                         <div>
                             <span class="badge bg-info">{{ ucfirst($campaign->category) }}</span>
