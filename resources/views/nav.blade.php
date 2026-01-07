@@ -16,17 +16,12 @@
                 <li class="nav-item"><a class="nav-link" href="{{ route('guidelines') }}">Guidelines & FAQs</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('results') }}">Results</a></li>
                 @auth
-                    @if(auth()->user()->hasRole('administrator') || auth()->user()->hasRole('moderator'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                        </li>
-                    @endif
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ auth()->user()->name }}
                         </a>
                         <ul class="dropdown-menu">
-                            @if(auth()->user()->hasRole('administrator') || auth()->user()->hasRole('moderator'))
+                            @if(auth()->user()->hasRole('administrator') || auth()->user()->hasRole('moderator') || auth()->user()->hasPermission('manage-users') || auth()->user()->hasPermission('manage-roles') || auth()->user()->hasPermission('manage-permissions'))
                                 <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
                                 <li><hr class="dropdown-divider"></li>
                             @endif

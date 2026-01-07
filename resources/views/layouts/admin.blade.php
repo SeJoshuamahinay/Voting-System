@@ -260,6 +260,12 @@
                     <span>Users</span>
                 </a>
             </li>
+            <li>
+                <a href="{{ route('user-groups.index') }}" class="{{ request()->routeIs('user-groups.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span>User Groups</span>
+                </a>
+            </li>
             @endif
             @if (auth()->user()->hasPermission('manage-roles'))
                 <li>
@@ -269,10 +275,10 @@
                     </a>
                 </li>
             @endif
-             @if (!auth()->user()->hasPermission('manage-groups'))
+            @if (auth()->user()->hasPermission('manage-groups'))
                 <li>
                     <a href="{{ route('groups.index') }}" class="{{ request()->routeIs('groups.*') ? 'active' : '' }}">
-                        <i class="bi bi-people-fill"></i>
+                        <i class="bi bi-collection"></i>
                         <span>Groups</span>
                     </a>
                 </li>

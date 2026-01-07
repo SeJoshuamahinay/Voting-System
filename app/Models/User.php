@@ -24,11 +24,20 @@ class User extends Authenticatable
         'group_id',
     ];
     /**
-     * Get the group for the user.
+     * Get the group for the user (legacy - single group).
      */
     public function group()
     {
         return $this->belongsTo(Group::class);
+    }
+
+    /**
+     * Get the groups for the user (multiple groups).
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'user_group')
+                    ->withTimestamps();
     }
 
     /**

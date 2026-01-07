@@ -8,6 +8,7 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VotingCampaignController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\UserGroupController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -57,6 +58,22 @@ Route::middleware('auth')->group(function () {
     Route::resource('groups', GroupController::class);
     Route::post('groups/{group}/add-member', [GroupController::class, 'addMember'])->name('groups.addMember');
     Route::delete('groups/{group}/remove-member/{user}', [GroupController::class, 'removeMember'])->name('groups.removeMember');
+
+    // User-Group management routes
+    Route::get('user-groups', [UserGroupController::class, 'index'])->name('user-groups.index');
+    Route::get('user-groups/api-docs', function() {
+        return view('user-groups.api-docs');
+    })->name('user-groups.api-docs');
+    Route::get('user-groups/{user}/edit', [UserGroupController::class, 'edit'])->name('user-groups.edit');
+    Route::put('user-groups/{user}', [UserGroupController::class, 'update'])->name('user-groups.update');
+    Route::post('user-groups/{user}/attach', [UserGroupController::class, 'attach'])->name('user-groups.attach');
+    Route::delete('user-groups/{user}/detach/{group}', [UserGroupController::class, 'detach'])->name('user-groups.detach');
+    
+    // API endpoints for user-group data (JSON responses)
+    Route::prefix('api')->group(function() {
+        Route::get('users/{user}/groups', [UserGroupController::class, 'getUserGroups'])->name('api.user-groups');
+        Route::get('groups/{group}/users', [UserGroupController::class, 'getGroupUsers'])->name('api.group-users');
+    });
 
     // Role management routes
     Route::resource('roles', RoleController::class);
