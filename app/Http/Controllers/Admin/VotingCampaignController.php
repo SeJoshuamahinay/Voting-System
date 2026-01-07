@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\VotingCampaign;
 use App\Models\Candidate;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class VotingCampaignController extends Controller
@@ -47,7 +48,16 @@ class VotingCampaignController extends Controller
         // Handle checkbox: if not present in request, set to false
         $data['allow_multiple_votes'] = $request->has('allow_multiple_votes') ? 1 : 0;
 
-        VotingCampaign::create($data);
+        $campaign = VotingCampaign::create($data);
+        
+        // Log the activity
+        ActivityLog::log(
+            "Voting campaign '{$campaign->title}' was created by " . auth()->user()->name,
+            'created',
+            VotingCampaign::class,
+            $campaign->id,
+            ['title' => $campaign->title, 'category' => $campaign->category, 'status' => $campaign->status]
+        );
 
         return redirect()->route('voting-campaigns.index')
             ->with('success', 'Voting campaign created successfully!');
@@ -99,6 +109,15 @@ class VotingCampaignController extends Controller
         $data['allow_multiple_votes'] = $request->has('allow_multiple_votes') ? 1 : 0;
 
         $votingCampaign->update($data);
+        
+        // Log the activity
+        ActivityLog::log(
+            "Voting campaign '{$votingCampaign->title}' was updated by " . auth()->user()->name,
+            'updated',
+            VotingCampaign::class,
+            $votingCampaign->id,
+            ['title' => $votingCampaign->title, 'status' => $votingCampaign->status]
+        );
 
         return redirect()->route('voting-campaigns.index')
             ->with('success', 'Voting campaign updated successfully!');
@@ -109,7 +128,20 @@ class VotingCampaignController extends Controller
      */
     public function destroy(VotingCampaign $votingCampaign)
     {
+        $campaignTitle = $votingCampaign->title;
+        $campaignId = $votingCampaign->id;
+        
         $votingCampaign->delete();
+        
+        // Log the activity
+        ActivityLog::log(
+            "Voting campaign '{$campaignTitle}' was deleted by " . auth()->user()->name,
+            'deleted',
+            VotingCampaign::class,
+            $campaignId,
+            ['title' => $campaignTitle]
+        );
+        
         return redirect()->route('voting-campaigns.index')
             ->with('success', 'Voting campaign deleted successfully!');
     }
@@ -134,12 +166,21 @@ class VotingCampaignController extends Controller
             'order' => 'nullable|integer',
         ]);
 
-        \App\Models\Position::create([
+        $position = \App\Models\Position::create([
             'voting_campaign_id' => $votingCampaign->id,
             'title' => $request->title,
             'description' => $request->description,
             'order' => $request->order ?? 0,
         ]);
+        
+        // Log the activity
+        ActivityLog::log(
+            "Position '{$position->title}' was added to campaign '{$votingCampaign->title}' by " . auth()->user()->name,
+            'created',
+            \App\Models\Position::class,
+            $position->id,
+            ['position_title' => $position->title, 'campaign_title' => $votingCampaign->title]
+        );
 
         return redirect()->route('voting-campaigns.positions', $votingCampaign)
             ->with('success', 'Position added successfully!');
@@ -153,8 +194,21 @@ class VotingCampaignController extends Controller
         if ($position->voting_campaign_id !== $votingCampaign->id) {
             return redirect()->back()->with('error', 'Position does not belong to this campaign!');
         }
+        
+        $positionTitle = $position->title;
+        $positionId = $position->id;
 
         $position->delete();
+        
+        // Log the activity
+        ActivityLog::log(
+            "Position '{$positionTitle}' was deleted from campaign '{$votingCampaign->title}' by " . auth()->user()->name,
+            'deleted',
+            \App\Models\Position::class,
+            $positionId,
+            ['position_title' => $positionTitle, 'campaign_title' => $votingCampaign->title]
+        );
+        
         return redirect()->route('voting-campaigns.positions', $votingCampaign)
             ->with('success', 'Position deleted successfully!');
     }
@@ -188,7 +242,16 @@ class VotingCampaignController extends Controller
             $data['photo'] = $request->file('photo')->store('candidates', 'public');
         }
 
-        Candidate::create($data);
+        $candidate = Candidate::create($data);
+        
+        // Log the activity
+        ActivityLog::log(
+            "Candidate '{$candidate->name}' was added to campaign '{$votingCampaign->title}' by " . auth()->user()->name,
+            'created',
+            Candidate::class,
+            $candidate->id,
+            ['candidate_name' => $candidate->name, 'campaign_title' => $votingCampaign->title]
+        );
 
         return redirect()->route('voting-campaigns.candidates', $votingCampaign)
             ->with('success', 'Candidate added successfully!');
@@ -202,8 +265,21 @@ class VotingCampaignController extends Controller
         if ($candidate->voting_campaign_id !== $votingCampaign->id) {
             return redirect()->back()->with('error', 'Candidate does not belong to this campaign!');
         }
+        
+        $candidateName = $candidate->name;
+        $candidateId = $candidate->id;
 
         $candidate->delete();
+        
+        // Log the activity
+        ActivityLog::log(
+            "Candidate '{$candidateName}' was deleted from campaign '{$votingCampaign->title}' by " . auth()->user()->name,
+            'deleted',
+            Candidate::class,
+            $candidateId,
+            ['candidate_name' => $candidateName, 'campaign_title' => $votingCampaign->title]
+        );
+        
         return redirect()->route('voting-campaigns.candidates', $votingCampaign)
             ->with('success', 'Candidate deleted successfully!');
     }

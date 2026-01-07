@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     // Voting
     Route::get('/voting', [VoteController::class, 'index'])->name('voting.index');
     Route::post('/vote', [VoteController::class, 'store'])->name('vote.store');
+    Route::get('/vote/receipt', [VoteController::class, 'downloadReceipt'])->name('vote.receipt');
 
     // User management routes
     Route::resource('users', UserController::class);

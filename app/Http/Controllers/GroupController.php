@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Group;
+use App\Models\ActivityLog;
 
 class GroupController extends Controller
 {
@@ -37,6 +38,16 @@ class GroupController extends Controller
         ]);
         $validated['is_private'] = $request->has('is_private');
         $group = Group::create($validated);
+        
+        // Log the activity
+        ActivityLog::log(
+            "Group '{$group->name}' was created by " . auth()->user()->name,
+            'created',
+            Group::class,
+            $group->id,
+            ['name' => $group->name, 'is_private' => $group->is_private]
+        );
+        
         return redirect()->route('groups.show', $group)->with('success', 'Group created successfully.');
     }
 
@@ -84,6 +95,15 @@ class GroupController extends Controller
         // Assign group_id to selected users
         \App\Models\User::whereIn('id', $memberIds)
             ->update(['group_id' => $group->id]);
+        
+        // Log the activity
+        ActivityLog::log(
+            "Group '{$group->name}' was updated by " . auth()->user()->name,
+            'updated',
+            Group::class,
+            $group->id,
+            ['name' => $group->name, 'members_count' => count($memberIds)]
+        );
 
         return redirect()->route('groups.show', $group)->with('success', 'Group updated successfully.');
     }
@@ -94,7 +114,19 @@ class GroupController extends Controller
     public function destroy(string $id)
     {
         $group = Group::findOrFail($id);
+        $groupName = $group->name;
+        
         $group->delete();
+        
+        // Log the activity
+        ActivityLog::log(
+            "Group '{$groupName}' was deleted by " . auth()->user()->name,
+            'deleted',
+            Group::class,
+            $id,
+            ['name' => $groupName]
+        );
+        
         return redirect()->route('groups.index')->with('success', 'Group deleted successfully.');
     }
     /**
@@ -117,6 +149,15 @@ class GroupController extends Controller
         $user->group_id = $group->id;
         $user->save();
         
+        // Log the activity
+        ActivityLog::log(
+            "User '{$user->name}' was added to group '{$group->name}' by " . auth()->user()->name,
+            'updated',
+            Group::class,
+            $group->id,
+            ['action' => 'member_added', 'user_id' => $user->id, 'user_name' => $user->name]
+        );
+        
         return redirect()->route('groups.edit', $group)->with('success', 'Member added successfully.');
     }
 
@@ -135,6 +176,15 @@ class GroupController extends Controller
         
         $user->group_id = null;
         $user->save();
+        
+        // Log the activity
+        ActivityLog::log(
+            "User '{$user->name}' was removed from group '{$group->name}' by " . auth()->user()->name,
+            'updated',
+            Group::class,
+            $group->id,
+            ['action' => 'member_removed', 'user_id' => $user->id, 'user_name' => $user->name]
+        );
         
         return redirect()->route('groups.edit', $group)->with('success', 'Member removed successfully.');
     }
