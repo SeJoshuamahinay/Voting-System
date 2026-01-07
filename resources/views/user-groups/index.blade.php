@@ -11,9 +11,6 @@
                     <h1 class="mb-3">User Groups Management</h1>
                     <p class="text-muted">Manage which groups each user belongs to</p>
                 </div>
-                <a href="{{ route('user-groups.api-docs') }}" class="btn btn-outline-info">
-                    <i class="bi bi-file-code"></i> API Documentation
-                </a>
             </div>
         </div>
     </div>

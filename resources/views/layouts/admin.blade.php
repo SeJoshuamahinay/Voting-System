@@ -316,6 +316,12 @@
 
             <li class="sidebar-section">Settings</li>
             <li>
+                <a href="{{ route('activity-logs.index') }}" class="{{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
+                    <i class="bi bi-activity"></i>
+                    <span>Activity Logs</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('about') }}">
                     <i class="bi bi-info-circle"></i>
                     <span>About</span>
