@@ -84,15 +84,15 @@
         <div class="col-12 col-md-6 mb-3">
             <div class="stats-card-2 w-100">
                 <h6 class="mb-2">Active Campaigns</h6>
-                <h2 class="mb-0">{{ $activeCampaigns }}</h2>
+                <h2 class="mb-0">{{ $campaigns->filter(fn($c) => $c->isActive() && !$c->isExpired())->count() }}</h2>
                 <small><i class="bi bi-lightning-fill"></i> Currently in progress</small>
             </div>
         </div>
         <div class="col-12 col-md-6 mb-3">
             <div class="stats-card-3 w-100">
                 <h6 class="mb-2">Total Campaigns</h6>
-                <h2 class="mb-0">{{ $totalCampaigns }}</h2>
-                <small><i class="bi bi-calendar-check"></i> All time</small>
+                <h2 class="mb-0">{{ $campaigns->count() }}</h2>
+                <small><i class="bi bi-calendar-check"></i> {{ $search ? 'Matching results' : 'All time' }}</small>
             </div>
         </div>
     </div>
@@ -183,7 +183,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($positionCandidates->sortByDesc('vote_count') as $index => $candidate)
+                                                @foreach($positionCandidates->sortByDesc('vote_count')->values() as $index => $candidate)
                                                     <tr>
                                                         <td>
                                                             @if($index === 0)
@@ -362,7 +362,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($campaign->candidates->sortByDesc('vote_count') as $index => $candidate)
+                                    @foreach($campaign->candidates->sortByDesc('vote_count')->values() as $index => $candidate)
                                         <tr>
                                             <td>
                                                 @if($index === 0)

@@ -63,6 +63,9 @@
                                         <a href="{{ route('voting-campaigns.show', $campaign) }}" class="btn btn-sm btn-info" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        <a href="{{ route('voting-campaigns.positions', $campaign) }}" class="btn btn-sm btn-primary" title="Manage Positions">
+                                            <i class="bi bi-award"></i>
+                                        </a>
                                         <a href="{{ route('voting-campaigns.candidates', $campaign) }}" class="btn btn-sm btn-secondary" title="Manage Candidates">
                                             <i class="bi bi-people"></i>
                                         </a>
