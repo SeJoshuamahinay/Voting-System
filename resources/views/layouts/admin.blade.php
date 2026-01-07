@@ -263,7 +263,7 @@
             <li>
                 <a href="{{ route('user-groups.index') }}" class="{{ request()->routeIs('user-groups.*') ? 'active' : '' }}">
                     <i class="bi bi-person-lines-fill"></i>
-                    <span>User Groups</span>
+                    <span>Group Management</span>
                 </a>
             </li>
             @endif
