@@ -20,7 +20,7 @@
                 <ul class="navbar-nav ms-auto">
                     @auth
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('voting') }}">Voting</a>
+                            <a class="nav-link" href="{{ route('voting.index') }}">Voting</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>

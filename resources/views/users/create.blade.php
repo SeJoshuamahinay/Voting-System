@@ -50,15 +50,38 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="group_id" class="form-label">Group</label>
+                        <label for="group_id" class="form-label">Primary Group (Legacy)</label>
                         <select name="group_id" id="group_id" class="form-select">
-                            <option value="">-- No Group --</option>
+                            <option value="">-- No Primary Group --</option>
                             @foreach ($groups as $group)
                                 <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>
                                     {{ $group->name }}
                                 </option>
                             @endforeach
                         </select>
+                        <small class="text-muted">For backward compatibility only</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Assign Groups (Multiple)</label>
+                        <div class="row">
+                            @foreach ($groups as $group)
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                            name="groups[]" value="{{ $group->id }}" 
+                                            id="group{{ $group->id }}"
+                                            {{ in_array($group->id, old('groups', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="group{{ $group->id }}">
+                                            {{ $group->name }}
+                                            @if($group->description)
+                                                <small class="text-muted d-block">{{ $group->description }}</small>
+                                            @endif
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <div class="mb-3">
