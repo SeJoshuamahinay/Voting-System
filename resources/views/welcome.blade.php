@@ -159,56 +159,6 @@
             </div>
     </section>
 
-    <!-- FAQ SECTION -->
-    <section class="py-5">
-        <div class="container">
-            <h3 class="text-center fw-bold mb-4">Frequently Asked Questions</h3>
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <div class="accordion" id="faq1">
-                        <div class="accordion-item faq-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" data-bs-toggle="collapse"
-                                    data-bs-target="#q1">
-                                    What is Vote2Voice?
-                                </button>
-                            </h2>
-                            <div id="q1" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    Placeholder answer.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Repeat FAQ Items -->
-                <div class="col-md-6">
-                    <div class="accordion" id="faq2">
-                        <div class="accordion-item faq-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" data-bs-toggle="collapse"
-                                    data-bs-target="#q2">
-                                    How are the results displayed?
-                                </button>
-                            </h2>
-                            <div id="q2" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    Placeholder answer.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Add More FAQ blocks as needed -->
-
-            </div>
-        </div>
-    </section>
-
     <!-- FOOTER SECTION -->
     <footer class="footer-bg pt-4">
         <div class="container">
