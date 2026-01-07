@@ -1,24 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Vote2Voice - Voting Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vote2Voice - Guidelines & FAQs</title>
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <style>
+        .faq-answer {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+    </style>
+</head>
 
-    <!-- Frequently Asked Questions -->
-    @extends('layouts.app')
+<body>
 
-@section('content') 
+{{-- NAVIGATION --}}
+@include('nav')
+
 <div class="container py-5">
-    <h1 class="text-center mb-5">Frequently Asked Questions</h1>
+    {{-- Top Image --}}
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8 text-center">
+            {{-- Main Guidelines Icon (PNG) --}}
+            <img src="{{ asset('assets/faq.png') }}" alt="Vote2Voice guidelines icon" class="img-fluid mb-3" style="max-height: 120px;">
+        </div>
+    </div>
 
+    {{-- Voter Guidelines --}}
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <h2 class="mb-4 text-center">Voter Guidelines</h2>
+            <ul class="list-group list-group-flush">
+                @php
+                    $guidelines = [
+                        "Ensure your account is registered and verified before the election to vote securely.",
+                        "Each voter can only vote once per election. Multiple votes are allowed per position.",
+                        "Follow the official election period. Votes outside the designated start and end times will not be counted.",
+                        "Check candidate information before voting to make an informed decision.",
+                        "Fraudulent activity or vote manipulation is prohibited. The system monitors suspicious behavior automatically.",
+                        "After voting, you will receive a confirmation for transparency and verification.",
+                        "Detailed reports summarizing total votes, turnout, and election outcomes are available for review after the election concludes."
+                    ];
+                @endphp
+
+                @foreach($guidelines as $index => $guideline)
+                    <li class="list-group-item d-flex align-items-center">
+                        <img src="{{ asset('assets/guideline.png') }}" alt="Guideline icon {{ $index + 1 }}" class="me-3" style="width:32px; height:32px;" />
+                        {{ $guideline }}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+
+    {{-- Frequently Asked Questions --}}
     <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+        </div>
+
         {{-- Left Column --}}
-        <div class="col-md-6">
+        <div class="col-md-6 mb-4 mb-md-0">
             @php
                 $faqsLeft = [
                     ["question" => "What are the community rules?", "answer" => "Our rules promote respect, safety, and constructive engagement across all interactions."],
@@ -67,8 +114,6 @@
     </div>
 </div>
 
-{{-- FAQ Toggle Script --}}
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const faqItems = document.querySelectorAll('.faq-item');
@@ -85,50 +130,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
-
-{{-- Optional CSS for smooth dropdown --}}
-@push('styles')
-<style>
-.faq-answer {
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-}
-</style>
-@endpush
-@endsection
-
-
-
-    <!-- Voters Guidelines -->
-    <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h2 class="mb-4">Voter Guidelines</h2>
-        <ul class="list-group list-group-flush">
-            @php
-                $guidelines = [
-                    "Ensure your account is registered and verified before the election to vote securely.",
-                    "Each voter can only vote once per election. Multiple votes are allowed per position.",
-                    "Follow the official election period. Votes outside the designated start and end times will not be counted.",
-                    "Check candidate information before voting to make an informed decision.",
-                    "Fraudulent activity or vote manipulation is prohibited. The system monitors suspicious behavior automatically.",
-                    "After voting, you will receive a confirmation for transparency and verification.",
-                    "Detailed reports summarizing total votes, turnout, and election outcomes are available for review after the election concludes."
-              ];
-            @endphp
-
-            @foreach($guidelines as $index => $guideline)
-                <li class="list-group-item d-flex align-items-center">
-                    <img src="/assets/guideline.png" alt="Guideline icon {{ $index + 1 }}" class="me-3" style="width:32px; height:32px;" />
-                    {{ $guideline }}
-                </li>
-            @endforeach
-        </ul>
-    </div>
-</div>
-
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>
