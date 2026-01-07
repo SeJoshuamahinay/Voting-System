@@ -8,6 +8,7 @@
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <div class="container d-flex flex-column align-items-center justify-content-center" style="min-height:100vh;">
         <!-- Logo Row -->
@@ -47,13 +48,12 @@
                     </div>
                     <div class="mb-1 position-relative">
                         <label for="password" class="form-label fw-bold">Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control border-0 border-bottom" id="password" name="password"
-                                placeholder="Enter your password" required>
-                            <span class="input-group-text border-0" style="cursor:pointer;"
-                                id="togglePassword">
-                                <i class="bi bi-eye" style="font-size:1.5rem; color:black;"></i>
-                            </span>
+                        <div class="d-flex align-items-center border-bottom">
+                            <input type="password" class="form-control border-0 flex-grow-1" id="password" name="password"
+                                placeholder="Enter your password" required style="box-shadow: none;">
+                            <button type="button" class="btn btn-link p-0 border-0" id="togglePassword" style="text-decoration: none;">
+                                <i class="bi bi-eye" style="font-size:1.25rem; color:#666;"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -72,8 +72,7 @@
                         <span class="mx-2 text-muted small">Or</span>
                         <hr class="flex-grow-1">
                     </div>
-                    <a href="{{ route('register') }}" class="btn w-100"
-                        style="background:#ccc; color:#222; border-radius:2rem; font-weight:bold;">Create New Account</a>
+                    <a href="{{ route('register') }}" class="text-decoration-underline justify-content-center d-flex">Create an account?</a>
                 </form>
             </div>
         </div>
