@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'User Groups Management')
 
@@ -10,6 +10,14 @@
                 <div>
                     <h1 class="mb-3">User Groups Management</h1>
                     <p class="text-muted">Manage which groups each user belongs to</p>
+                </div>
+                <div>
+                <a href="{{ route('groups.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create New Group
+                </a>
+                <a href="{{ route('groups.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-list"></i> View All Groups
+                </a>
                 </div>
             </div>
         </div>

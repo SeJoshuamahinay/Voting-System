@@ -83,7 +83,7 @@ cp .env.example .env
 Or on Windows:
 ```powershell
 Copy-Item .env.example .env
-```
+```c
 
 Edit `.env` and configure your database and application settings:
 ```env

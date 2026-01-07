@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Edit User Groups')
 
@@ -111,27 +111,6 @@
             </div>
 
             <!-- Quick Add Group -->
-            <div class="card mt-3">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0"><i class="bi bi-plus-circle"></i> Quick Add Group</h6>
-                </div>
-                <div class="card-body">
-                    <form id="quickAddForm">
-                        @csrf
-                        <div class="mb-2">
-                            <select class="form-select" id="quickAddGroup">
-                                <option value="">Select a group...</option>
-                                @foreach($allGroups->whereNotIn('id', $user->groups->pluck('id')) as $group)
-                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm w-100" onclick="quickAddGroup()">
-                            <i class="bi bi-plus"></i> Add Group
-                        </button>
-                    </form>
-                </div>
-            </div>
         </div>
     </div>
 </div>
