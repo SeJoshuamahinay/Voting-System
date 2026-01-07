@@ -235,7 +235,7 @@
 
 <body>
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar overflow-auto" id="sidebar">
         <div class="sidebar-header text-center">
             <a href="{{ route('welcome') }}">
                 <img src="{{ asset('assets/logo.png') }}" alt="Vote2Voice Logo" style="height:48px;" />
