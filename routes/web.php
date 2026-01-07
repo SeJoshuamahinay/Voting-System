@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VotingCampaignController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\UserGroupController;
+use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -80,6 +81,13 @@ Route::middleware('auth')->group(function () {
 
     // Permission management routes
     Route::resource('permissions', PermissionController::class);
+
+    // Activity Logs routes
+    Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('activity-logs/stats', [ActivityLogController::class, 'stats'])->name('activity-logs.stats');
+    Route::get('activity-logs/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
+    Route::get('activity-logs/{activityLog}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::post('activity-logs/clear', [ActivityLogController::class, 'clear'])->name('activity-logs.clear');
 
     // Voting Campaign management routes
     Route::resource('voting-campaigns', VotingCampaignController::class);

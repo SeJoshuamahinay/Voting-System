@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Group;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -62,6 +63,15 @@ class UserController extends Controller
         if ($request->has('groups')) {
             $user->groups()->sync($request->groups);
         }
+
+        // Log the activity
+        ActivityLog::log(
+            "User {$user->name} was created by " . auth()->user()->name,
+            'created',
+            User::class,
+            $user->id,
+            ['roles' => $request->roles ?? [], 'groups' => $request->groups ?? []]
+        );
 
         return redirect()->route('users.index')->with('success', 'User created successfully!');
     }
@@ -127,6 +137,15 @@ class UserController extends Controller
             $user->groups()->detach();
         }
 
+        // Log the activity
+        ActivityLog::log(
+            "User {$user->name} was updated by " . auth()->user()->name,
+            'updated',
+            User::class,
+            $user->id,
+            ['roles' => $request->roles ?? [], 'groups' => $request->groups ?? []]
+        );
+
         return redirect()->route('users.index')->with('success', 'User updated successfully!');
     }
 
@@ -140,7 +159,19 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('error', 'You cannot delete your own account!');
         }
 
+        $userName = $user->name;
+        $userId = $user->id;
+        
         $user->delete();
+        
+        // Log the activity
+        ActivityLog::log(
+            "User {$userName} was deleted by " . auth()->user()->name,
+            'deleted',
+            User::class,
+            $userId
+        );
+        
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');
     }
 }

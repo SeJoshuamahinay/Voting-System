@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -32,6 +33,15 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+            
+            // Log the login activity
+            ActivityLog::log(
+                "User {$user->name} logged in",
+                'login',
+                User::class,
+                $user->id
+            );
+            
             if ($user->hasRole('administrator') || $user->hasRole('moderator')) {
                 return redirect()->intended('/admin/dashboard')->with('success', 'Login successful!');
             } else {
@@ -76,6 +86,14 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
+        
+        // Log the registration activity
+        ActivityLog::log(
+            "New user {$user->name} registered",
+            'registered',
+            User::class,
+            $user->id
+        );
 
         return redirect('/welcome')->with('success', 'Registration successful!');
     }
@@ -85,6 +103,18 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        
+        // Log the logout activity before actually logging out
+        if ($user) {
+            ActivityLog::log(
+                "User {$user->name} logged out",
+                'logout',
+                User::class,
+                $user->id
+            );
+        }
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

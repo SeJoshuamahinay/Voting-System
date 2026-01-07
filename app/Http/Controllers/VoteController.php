@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\VotingCampaign;
 use App\Models\Candidate;
 use App\Models\Vote;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -141,6 +142,15 @@ class VoteController extends Controller
                 DB::commit();
 
                 if ($votesCreated > 0) {
+                    // Log the voting activity
+                    ActivityLog::log(
+                        auth()->user()->name . " cast {$votesCreated} vote(s) in campaign: {$campaign->title}",
+                        'voted',
+                        VotingCampaign::class,
+                        $campaign->id,
+                        ['votes_count' => $votesCreated, 'candidate_ids' => $candidateIds]
+                    );
+                    
                     return redirect()->route('voting.index')
                         ->with('success', "Successfully cast {$votesCreated} vote(s)!");
                 } else {
@@ -186,6 +196,15 @@ class VoteController extends Controller
                 }
 
                 DB::commit();
+
+                // Log the voting activity
+                ActivityLog::log(
+                    auth()->user()->name . " cast {$votesCreated} vote(s) in campaign: {$campaign->title}",
+                    'voted',
+                    VotingCampaign::class,
+                    $campaign->id,
+                    ['votes_count' => $votesCreated, 'candidate_ids' => $candidateIds]
+                );
 
                 if ($votesCreated === 1) {
                     return redirect()->route('voting.index')
