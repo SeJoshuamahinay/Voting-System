@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Group;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class UserGroupController extends Controller
@@ -41,6 +42,15 @@ class UserGroupController extends Controller
         ]);
 
         $user->groups()->sync($request->input('groups', []));
+        
+        // Log the activity
+        ActivityLog::log(
+            "User '{$user->name}' groups were updated by " . auth()->user()->name,
+            'updated',
+            User::class,
+            $user->id,
+            ['groups' => $request->input('groups', [])]
+        );
 
         return redirect()->route('user-groups.index')
                         ->with('success', 'User groups updated successfully');
@@ -57,6 +67,17 @@ class UserGroupController extends Controller
 
         if (!$user->groups()->where('group_id', $request->group_id)->exists()) {
             $user->groups()->attach($request->group_id);
+            
+            $group = Group::find($request->group_id);
+            // Log the activity
+            ActivityLog::log(
+                "User '{$user->name}' was added to group '{$group->name}' by " . (auth()->user()->name ?? 'System'),
+                'updated',
+                User::class,
+                $user->id,
+                ['action' => 'group_attached', 'group_id' => $request->group_id]
+            );
+            
             return response()->json(['message' => 'Group attached successfully']);
         }
 
@@ -69,6 +90,15 @@ class UserGroupController extends Controller
     public function detach(User $user, Group $group)
     {
         $user->groups()->detach($group->id);
+        
+        // Log the activity
+        ActivityLog::log(
+            "User '{$user->name}' was removed from group '{$group->name}' by " . (auth()->user()->name ?? 'System'),
+            'updated',
+            User::class,
+            $user->id,
+            ['action' => 'group_detached', 'group_id' => $group->id]
+        );
         
         return response()->json(['message' => 'Group detached successfully']);
     }
